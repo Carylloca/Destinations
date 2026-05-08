@@ -30,35 +30,79 @@
 <script>
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
 
-const voyages = [
+const voyages = 
+{
+    "titre": "Ile Maurice 2025 - 2026 ",
+    "etapes": [
     {
-        "titre": "Ile Maurice 2025 - 2026 ",
-        "etapes": [
-            {
-                "nom": "Genève aéroport",
-                "typeEtape": "depart",
-                "transport": "avion",
-                "lon": 6.1102707,
-                "lat": 46.2313343,
-                "lien": "",
-                "photo": "",
-                "couleur": "#3498db",
-                "hauteurArc": 400000
-            },
-            {
-                "nom": "Ile Maurice",
-                "typeEtape": "etape",
-                "transport": "avion",
-                "lon": 57.68062591552735,
-                "lat": -20.43346746273106,
-                "lien": "",
-                "photo": "",
-                "couleur": "#3498db",
-                "hauteurArc": 400000
-            }
-        ]
+        "nom": "Genève aéroport",
+        "typeEtape": "depart",
+        "transport": "avion",
+        "lon": 6.1102707,
+        "lat": 46.2313343,
+        "lien": "",
+        "photo": "",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Aéroport Ile Maurice",
+        "typeEtape": "etape",
+        "transport": "avion",
+        "lon": 63.3591218,
+        "lat": -19.7567812,
+        "lien": "",
+        "photo": "",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "OUTRIGGER Mauritius Beach Resort",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.4174577,
+        "lat": -20.5107092,
+        "lien": "",
+        "photo": "",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    },
+    {
+        "nom": "Hôtel: Canonnier Beachcomber",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.55462646484376,
+        "lat": -20.002240446031553,
+        "lien": "",
+        "photo": "",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    },
+    {
+        "nom": "Ile Maurice",
+        "typeEtape": "depart",
+        "transport": "avion",
+        "lon": 57.68148422241212,
+        "lat": -20.434035499044324,
+        "lien": "",
+        "photo": "",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "genève aéroport",
+        "typeEtape": "arrivee",
+        "transport": "avion",
+        "lon": 6.1102707,
+        "lat": 46.2313343,
+        "lien": "",
+        "photo": "",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
     }
-]; // <-- Tu colles ici les voyages générés par generator.html
+]
+},
+; // <-- Tu colles ici les voyages générés par generator.html
 
 // === CODE CESIUM ===
 
