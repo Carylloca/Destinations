@@ -3,41 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <title>Générateur de voyages CesiumJS</title>
+
 <style>
-    body { font-family: Arial; margin: 20px; }
-    input, select { padding: 6px; margin: 4px; width: 300px; }
-    button { padding: 10px 20px; margin-top: 10px; }
-    .etape { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
-    textarea { width: 100%; height: 300px; margin-top: 20px; }
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 20px;
+    }
+    h2, h3 {
+        color: #2c3e50;
+    }
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    input, select {
+        padding: 8px;
+        margin: 6px 0;
+        width: 300px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+    button {
+        padding: 10px 20px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    button:hover {
+        background: #2980b9;
+    }
+    .etape {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+        background: #fafafa;
+    }
+    textarea {
+        width: 100%;
+        height: 300px;
+        margin-top: 20px;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .preview-map {
+        width: 100%;
+        height: 200px;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
 </style>
+
+<!-- Leaflet pour la prévisualisation -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 </head>
 <body>
 
 <h2>🧭 Générateur de voyages CesiumJS</h2>
 
-<label>Nom du voyage :</label><br>
-<input id="nomVoyage" placeholder="Ex: Vol Genève → Papeete"><br>
+<div class="card">
+    <h3>Informations du voyage</h3>
 
-<label>Type de voyage :</label><br>
-<select id="typeVoyage">
-    <option value="avion">Avion</option>
-    <option value="bateau">Bateau</option>
-    <option value="voiture">Voiture</option>
-    <option value="train">Train</option>
-</select><br>
+    <label>Nom du voyage :</label><br>
+    <input id="nomVoyage" placeholder="Ex: Vol Genève → Papeete"><br>
 
-<label>Couleur du voyage :</label><br>
-<input id="couleurVoyage" value="#3498db"><br>
+    <label>Type de voyage :</label><br>
+    <select id="typeVoyage">
+        <option value="avion">Avion</option>
+        <option value="bateau">Bateau</option>
+        <option value="voiture">Voiture</option>
+        <option value="train">Train</option>
+    </select><br>
 
-<h3>Étapes</h3>
-<div id="etapes"></div>
+    <label>Couleur du voyage :</label><br>
+    <input id="couleurVoyage" value="#3498db"><br>
+</div>
 
-<button onclick="ajouterEtape()">➕ Ajouter une étape</button>
-<br><br>
-<button onclick="genererCode()">🚀 Générer le code CesiumJS</button>
+<div class="card">
+    <h3>Étapes</h3>
+    <div id="etapes"></div>
+    <button onclick="ajouterEtape()">➕ Ajouter une étape</button>
+</div>
 
-<h3>Code généré :</h3>
-<textarea id="output"></textarea>
+<div class="card">
+    <button onclick="genererCode()">🚀 Générer le code CesiumJS</button>
+    <button onclick="copierCode()">📋 Copier le code</button>
+
+    <h3>Code généré :</h3>
+    <textarea id="output"></textarea>
+</div>
 
 <script>
 let compteur = 0;
@@ -46,21 +110,64 @@ function ajouterEtape() {
     compteur++;
     const div = document.createElement("div");
     div.className = "etape";
+
+    const id = "map" + compteur;
+
     div.innerHTML = `
         <h4>Étape ${compteur}</h4>
-        <input placeholder="Nom" class="nom"><br>
+
+        <input placeholder="Lieu (ex: Paris CDG)" class="lieu" onblur="rechercherCoordonnees(this)"><br>
+
         <select class="type">
             <option value="depart">Départ</option>
             <option value="escale">Escale</option>
             <option value="etape">Étape</option>
             <option value="arrivee">Arrivée</option>
         </select><br>
+
         <input placeholder="Longitude" class="lon"><br>
         <input placeholder="Latitude" class="lat"><br>
+
         <input placeholder="Lien externe" class="lien"><br>
         <input placeholder="URL photo" class="photo"><br>
+
+        <div id="${id}" class="preview-map"></div>
     `;
+
     document.getElementById("etapes").appendChild(div);
+
+    // Mini carte Leaflet
+    const map = L.map(id).setView([0, 0], 2);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+    div.map = map;
+    div.marker = null;
+}
+
+async function rechercherCoordonnees(input) {
+    const lieu = input.value;
+    const parent = input.closest(".etape");
+
+    if (!lieu) return;
+
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(lieu)}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.length === 0) return;
+
+    const lon = data[0].lon;
+    const lat = data[0].lat;
+
+    parent.querySelector(".lon").value = lon;
+    parent.querySelector(".lat").value = lat;
+
+    // Mise à jour de la mini carte
+    parent.map.setView([lat, lon], 8);
+
+    if (parent.marker) parent.map.removeLayer(parent.marker);
+    parent.marker = L.marker([lat, lon]).addTo(parent.map);
 }
 
 function genererCode() {
@@ -74,7 +181,7 @@ function genererCode() {
 
     etapesDiv.forEach(e => {
         etapes.push([
-            e.querySelector(".nom").value,
+            e.querySelector(".lieu").value,
             e.querySelector(".type").value,
             parseFloat(e.querySelector(".lon").value),
             parseFloat(e.querySelector(".lat").value),
@@ -93,6 +200,12 @@ function genererCode() {
 `;
 
     document.getElementById("output").value = code;
+}
+
+function copierCode() {
+    const textarea = document.getElementById("output");
+    textarea.select();
+    document.execCommand("copy");
 }
 </script>
 
