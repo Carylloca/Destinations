@@ -29,15 +29,15 @@
 <div id="cesiumContainer"></div>
 
 <script>
-/* ---------------------------------------------------
-   🔑 TA CLÉ CESIUM ION
---------------------------------------------------- */
+// ---------------------------------------------------
+// 🔑 TA CLÉ CESIUM ION
+// ---------------------------------------------------
 Cesium.Ion.defaultAccessToken =
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g";
 
-/* ---------------------------------------------------
-   🌍 Initialisation du globe 3D
---------------------------------------------------- */
+// ---------------------------------------------------
+// 🌍 Initialisation du globe 3D
+// ---------------------------------------------------
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrainProvider: Cesium.createWorldTerrain(),
     sceneMode: Cesium.SceneMode.SCENE3D,
@@ -50,9 +50,9 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     baseLayerPicker: true
 });
 
-/* ---------------------------------------------------
-   📌 Voyages (avec photos + liens)
---------------------------------------------------- */
+// ---------------------------------------------------
+// 📌 Voyages (avec photos + liens)
+// ---------------------------------------------------
 const voyages = [
     {
         nom: "Italie 2022",
@@ -69,32 +69,20 @@ const voyages = [
                 coords: [9.19, 45.4642],
                 lien: "https://fr.wikipedia.org/wiki/Milan",
                 photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Milan_Duomo.jpg/640px-Milan_Duomo.jpg"
-            },
-            {
-                nom: "Florence",
-                coords: [11.2558, 43.7696],
-                lien: "https://fr.wikipedia.org/wiki/Florence",
-                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Florence_skyline.jpg/640px-Florence_skyline.jpg"
-            },
-            {
-                nom: "Rome",
-                coords: [12.4964, 41.9028],
-                lien: "https://fr.wikipedia.org/wiki/Rome",
-                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Colosseo_2020.jpg/640px-Colosseo_2020.jpg"
             }
         ]
     }
 ];
 
-/* ---------------------------------------------------
-   🎨 Styles
---------------------------------------------------- */
+// ---------------------------------------------------
+// 🎨 Styles
+// ---------------------------------------------------
 const couleurDepart = Cesium.Color.LIME.withAlpha(0.95);
 const couleurEtape = Cesium.Color.RED.withAlpha(0.9);
 
-/* ---------------------------------------------------
-   ✈️ Ajout d’un voyage
---------------------------------------------------- */
+// ---------------------------------------------------
+// ✈️ Ajout d’un voyage
+// ---------------------------------------------------
 function ajouterVoyage(voyage) {
     const positions = [];
 
@@ -130,7 +118,6 @@ function ajouterVoyage(voyage) {
         });
     });
 
-    // Ligne lumineuse
     viewer.entities.add({
         polyline: {
             positions: positions,
@@ -143,14 +130,14 @@ function ajouterVoyage(voyage) {
     });
 }
 
-/* ---------------------------------------------------
-   ➕ Ajout de tous les voyages
---------------------------------------------------- */
+// ---------------------------------------------------
+// ➕ Ajout de tous les voyages
+// ---------------------------------------------------
 voyages.forEach(ajouterVoyage);
 
-/* ---------------------------------------------------
-   🔍 Zoom automatique
---------------------------------------------------- */
+// ---------------------------------------------------
+// 🔍 Zoom automatique
+// ---------------------------------------------------
 viewer.zoomTo(viewer.entities);
 </script>
 
