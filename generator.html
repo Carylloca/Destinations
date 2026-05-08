@@ -172,7 +172,7 @@ function ajouterEtape() {
         if (div.marker) div.map.removeLayer(div.marker);
         div.marker = L.marker([lat, lon]).addTo(div.map);
     });
-}}
+}
 
 async function rechercherCoordonnees(input) {
     const lieu = input.value;
@@ -402,7 +402,6 @@ voyages.forEach(ajouterVoyage);
 viewer.zoomTo(viewer.entities);
 `;
 }
-        }
 </script>
 </body>
 </html>
