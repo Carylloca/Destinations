@@ -25,7 +25,7 @@
 
 <script>
 /* ---------------------------------------------------
-   🔑 TA CLÉ CESIUM ION (intégrée)
+   🔑 TA CLÉ CESIUM ION
 --------------------------------------------------- */
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g";
 
@@ -34,8 +34,8 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 --------------------------------------------------- */
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrainProvider: Cesium.createWorldTerrain(),
-    sceneMode: Cesium.SceneMode.SCENE3D,   // force le globe 3D
-    scene3DOnly: true,                     // désactive 2D et Columbus
+    sceneMode: Cesium.SceneMode.SCENE3D,
+    scene3DOnly: true,
     animation: false,
     timeline: false,
     geocoder: false,
@@ -45,27 +45,26 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 
 /* ---------------------------------------------------
-   📌 Voyages (exemples)
-   ➜ Tu peux en ajouter 20, 30, 50…
+   📌 Voyages (avec liens externes)
 --------------------------------------------------- */
 const voyages = [
     {
         nom: "Italie 2022",
         couleur: Cesium.Color.fromCssColorString("#e63946"),
         etapes: [
-            { nom: "Lausanne (Départ)", coords: [6.6323, 46.5197] },
-            { nom: "Milan", coords: [9.19, 45.4642] },
-            { nom: "Florence", coords: [11.2558, 43.7696] },
-            { nom: "Rome", coords: [12.4964, 41.9028] }
+            { nom: "Lausanne (Départ)", coords: [6.6323, 46.5197], lien: "https://google.com" },
+            { nom: "Milan", coords: [9.19, 45.4642], lien: "https://fr.wikipedia.org/wiki/Milan" },
+            { nom: "Florence", coords: [11.2558, 43.7696], lien: "https://fr.wikipedia.org/wiki/Florence" },
+            { nom: "Rome", coords: [12.4964, 41.9028], lien: "https://fr.wikipedia.org/wiki/Rome" }
         ]
     },
     {
         nom: "Portugal 2023",
         couleur: Cesium.Color.fromCssColorString("#1d3557"),
         etapes: [
-            { nom: "Genève (Départ)", coords: [6.1432, 46.2044] },
-            { nom: "Porto", coords: [-8.6291, 41.1579] },
-            { nom: "Lisbonne", coords: [-9.1393, 38.7223] }
+            { nom: "Genève (Départ)", coords: [6.1432, 46.2044], lien: "https://google.com" },
+            { nom: "Porto", coords: [-8.6291, 41.1579], lien: "https://fr.wikipedia.org/wiki/Porto" },
+            { nom: "Lisbonne", coords: [-9.1393, 38.7223], lien: "https://fr.wikipedia.org/wiki/Lisbonne" }
         ]
     }
 ];
@@ -77,7 +76,7 @@ const couleurDepart = Cesium.Color.LIME.withAlpha(0.95);
 const couleurEtape = Cesium.Color.RED.withAlpha(0.9);
 
 /* ---------------------------------------------------
-   ✈️ Fonction d’ajout d’un voyage
+   ✈️ Ajout d’un voyage
 --------------------------------------------------- */
 function ajouterVoyage(voyage) {
     const positions = [];
@@ -108,6 +107,7 @@ function ajouterVoyage(voyage) {
             description: `
                 <h3>${voyage.nom}</h3>
                 <p><b>Étape :</b> ${etape.nom}</p>
+                <p><a href="${etape.lien}" target="_blank">Ouvrir le lien externe</a></p>
             `
         });
     });
