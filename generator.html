@@ -62,7 +62,6 @@
     }
 </style>
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -101,7 +100,6 @@
 let compteur = 0;
 let voyagesAccumules = [];
 
-// Couleurs automatiques selon le transport
 const couleursTransport = {
     avion: "#3498db",
     bateau: "#1abc9c",
@@ -110,7 +108,6 @@ const couleursTransport = {
     marche: "#2ecc71"
 };
 
-// Hauteur des arcs
 const hauteurTransport = {
     avion: 400000,
     bateau: 20000,
@@ -159,14 +156,12 @@ function ajouterEtape() {
 
     document.getElementById("etapes").appendChild(div);
 
-    // Carte Leaflet
     const map = L.map(id).setView([0, 0], 2);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
     div.map = map;
     div.marker = null;
 
-    // Double‑clic pour placer un point
     map.on("dblclick", function(e) {
         const lat = e.latlng.lat;
         const lon = e.latlng.lng;
@@ -177,8 +172,7 @@ function ajouterEtape() {
         if (div.marker) div.map.removeLayer(div.marker);
         div.marker = L.marker([lat, lon]).addTo(div.map);
     });
-}
-}
+}}
 
 async function rechercherCoordonnees(input) {
     const lieu = input.value;
@@ -303,21 +297,7 @@ ${codeCesium()}
 `;
 
     document.getElementById("outputComplet").value = codeComplet;
-}
-
-function copierCode() {
-    const textarea = document.getElementById("output");
-    textarea.select();
-    document.execCommand("copy");
-}
-
-function copierCodeComplet() {
-    const textarea = document.getElementById("outputComplet");
-    textarea.select();
-    document.execCommand("copy");
-}
-
-function codeCesium() {
+}function codeCesium() {
 return String.raw`
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -337,6 +317,7 @@ const styleEtapes = {
     etape: Cesium.Color.RED.withAlpha(0.95),
     arrivee: Cesium.Color.ORANGE.withAlpha(0.95)
 };
+
 function arc3D(lon1, lat1, lon2, lat2, hauteur) {
     const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
     const p2 = Cesium.Cartesian3.fromDegrees(lon2, lat2);
@@ -421,8 +402,10 @@ voyages.forEach(ajouterVoyage);
 viewer.zoomTo(viewer.entities);
 `;
 }
+        }
 </script>
-</script>
-
 </body>
 </html>
+
+
+
