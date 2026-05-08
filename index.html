@@ -73,6 +73,11 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     navigationHelpButton: false,
     baseLayerPicker: true
 });
+    
+// Centrer la vue sur la Suisse
+viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
+});
 
 const styleEtapes = {
     depart: Cesium.Color.LIME.withAlpha(0.95),
