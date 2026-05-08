@@ -24,6 +24,8 @@
     </style>
 </head>
 <body>
+
+<!-- 📌 Liste des voyages -->
 <div style="
     position: absolute;
     top: 10px;
@@ -42,19 +44,14 @@
 <div id="cesiumContainer"></div>
 
 <script>
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
+Cesium.Ion.defaultAccessToken = "TA_CLE_CESIUM_ICI";
 
-<!-- 🟨🟨🟨 ZONE DE COLLAGE DU CODE DE VOYAGE 🟨🟨🟨 -->
-<div style="background-color: #fff8b3; padding: 10px; border: 2px dashed #f1c40f; border-radius: 8px;">
-    <pre style="color: #e67e22; font-weight: bold;">
-    ⬇️⬇️⬇️ COLLE TON CODE GÉNÉRÉ ICI ⬇️⬇️⬇️
-    </pre>
+// 🟨🟨🟨 ZONE DE COLLAGE DU CODE DE VOYAGE 🟨🟨🟨
+// Colle ici un ou plusieurs voyages générés par generator.html
 
-    <script>
-    // 🟩 Début du code de voyage généré 🟩
-    const voyages = [
+const voyages = [
     {
-        "titre": "Ile Maurice 2025 - 2026 ",
+        "titre": "Ile Maurice 2025 - 2026",
         "etapes": [
             {
                 "nom": "Genève aéroport",
@@ -80,25 +77,19 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
             }
         ]
     }
-]
+];
 
-    // 🟩 Fin du code de voyage généré 🟩
-    </script>
+// 🟨🟨🟨 FIN DE LA ZONE DE COLLAGE 🟨🟨🟨
 
-    <pre style="color: #e67e22; font-weight: bold;">
-    ⬆️⬆️⬆️ FIN DU COLLAGE ⬆️⬆️⬆️
-    </pre>
-</div>
-<!-- 🟨🟨🟨 FIN DE LA ZONE DE COLLAGE 🟨🟨🟨 -->
-<script>
 
-    const liste = document.getElementById("listeVoyages");
+// 📌 Affichage des titres dans la liste
+const liste = document.getElementById("listeVoyages");
 voyages.forEach(v => {
     const li = document.createElement("li");
     li.textContent = v.titre;
     liste.appendChild(li);
 });
-</script>
+
 
 // === CODE CESIUM ===
 
@@ -113,7 +104,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     navigationHelpButton: false,
     baseLayerPicker: true
 });
-    
+
 // Centrer la vue sur la Suisse
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
