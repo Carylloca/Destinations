@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Générateur de voyages CesiumJS</title>
+<style>
+    body { font-family: Arial; margin: 20px; }
+    input, select { padding: 6px; margin: 4px; width: 300px; }
+    button { padding: 10px 20px; margin-top: 10px; }
+    .etape { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+    textarea { width: 100%; height: 300px; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h2>🧭 Générateur de voyages CesiumJS</h2>
+
+<label>Nom du voyage :</label><br>
+<input id="nomVoyage" placeholder="Ex: Vol Genève → Papeete"><br>
+
+<label>Type de voyage :</label><br>
+<select id="typeVoyage">
+    <option value="avion">Avion</option>
+    <option value="bateau">Bateau</option>
+    <option value="voiture">Voiture</option>
+    <option value="train">Train</option>
+</select><br>
+
+<label>Couleur du voyage :</label><br>
+<input id="couleurVoyage" value="#3498db"><br>
+
+<h3>Étapes</h3>
+<div id="etapes"></div>
+
+<button onclick="ajouterEtape()">➕ Ajouter une étape</button>
+<br><br>
+<button onclick="genererCode()">🚀 Générer le code CesiumJS</button>
+
+<h3>Code généré :</h3>
+<textarea id="output"></textarea>
+
+<script>
+let compteur = 0;
+
+function ajouterEtape() {
+    compteur++;
+    const div = document.createElement("div");
+    div.className = "etape";
+    div.innerHTML = `
+        <h4>Étape ${compteur}</h4>
+        <input placeholder="Nom" class="nom"><br>
+        <select class="type">
+            <option value="depart">Départ</option>
+            <option value="escale">Escale</option>
+            <option value="etape">Étape</option>
+            <option value="arrivee">Arrivée</option>
+        </select><br>
+        <input placeholder="Longitude" class="lon"><br>
+        <input placeholder="Latitude" class="lat"><br>
+        <input placeholder="Lien externe" class="lien"><br>
+        <input placeholder="URL photo" class="photo"><br>
+    `;
+    document.getElementById("etapes").appendChild(div);
+}
+
+function genererCode() {
+    const nom = document.getElementById("nomVoyage").value;
+    const type = document.getElementById("typeVoyage").value;
+    const couleur = document.getElementById("couleurVoyage").value;
+
+    const etapesDiv = document.querySelectorAll(".etape");
+
+    let etapes = [];
+
+    etapesDiv.forEach(e => {
+        etapes.push([
+            e.querySelector(".nom").value,
+            e.querySelector(".type").value,
+            parseFloat(e.querySelector(".lon").value),
+            parseFloat(e.querySelector(".lat").value),
+            e.querySelector(".lien").value,
+            e.querySelector(".photo").value
+        ]);
+    });
+
+    const code = `
+{
+    nom: "${nom}",
+    type: "${type}",
+    couleur: Cesium.Color.fromCssColorString("${couleur}"),
+    etapes: ${JSON.stringify(etapes, null, 4)}
+},
+`;
+
+    document.getElementById("output").value = code;
+}
+</script>
+
+</body>
+</html>
