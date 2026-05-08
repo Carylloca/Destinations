@@ -178,6 +178,7 @@ function ajouterEtape() {
         div.marker = L.marker([lat, lon]).addTo(div.map);
     });
 }
+}
 
 async function rechercherCoordonnees(input) {
     const lieu = input.value;
@@ -336,7 +337,6 @@ const styleEtapes = {
     etape: Cesium.Color.RED.withAlpha(0.95),
     arrivee: Cesium.Color.ORANGE.withAlpha(0.95)
 };
-
 function arc3D(lon1, lat1, lon2, lat2, hauteur) {
     const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
     const p2 = Cesium.Cartesian3.fromDegrees(lon2, lat2);
