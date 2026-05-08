@@ -342,42 +342,6 @@ function copierCodeComplet() {
     }
 </style>
 
-function genererCode() {
-    const titre = document.getElementById("titreVoyage").value;
-
-    const etapesDiv = document.querySelectorAll(".etape");
-
-    let etapes = [];
-
-    etapesDiv.forEach(e => {
-        etapes.push({
-            nom: e.querySelector(".lieu").value,
-            typeEtape: e.querySelector(".typeEtape").value,
-            transport: e.querySelector(".transport").value,
-            lon: parseFloat(e.querySelector(".lon").value),
-            lat: parseFloat(e.querySelector(".lat").value),
-            lien: e.querySelector(".lien").value,
-            photo: e.querySelector(".photo").value,
-            couleur: couleursTransport[e.querySelector(".transport").value],
-            hauteurArc: hauteurTransport[e.querySelector(".transport").value]
-        });
-    });
-
-    const code = `
-{
-    titre: "${titre}",
-    etapes: ${JSON.stringify(etapes, null, 4)}
-},
-`;
-
-    document.getElementById("output").value = code;
-}
-
-function copierCode() {
-    const textarea = document.getElementById("output");
-    textarea.select();
-    document.execCommand("copy");
-}
 </script>
 
 </body>
