@@ -39,7 +39,7 @@ Cesium.Ion.defaultAccessToken =
 // 🌍 Initialisation du globe 3D
 // ---------------------------------------------------
 const viewer = new Cesium.Viewer("cesiumContainer", {
-    terrain: Cesium.Terrain.fromWorldTerrain(),   // ✔ nouvelle API
+    terrain: Cesium.Terrain.fromWorldTerrain(),
     sceneMode: Cesium.SceneMode.SCENE3D,
     scene3DOnly: true,
     animation: false,
@@ -88,7 +88,9 @@ function ajouterVoyage(voyage) {
 
     voyage.etapes.forEach((etape, index) => {
         const [lon, lat] = etape.coords;
-        const pos = Cesium.Cartesian3.fromDegrees(lon, lat);
+
+        // ✔ On place les points 2000m au-dessus du terrain
+        const pos = Cesium.Cartesian3.fromDegrees(lon, lat, 2000);
         positions.push(pos);
 
         viewer.entities.add({
@@ -118,10 +120,12 @@ function ajouterVoyage(voyage) {
         });
     });
 
+    // ✔ Ligne visible au-dessus du relief
     viewer.entities.add({
         polyline: {
             positions: positions,
             width: 3,
+            clampToGround: false, // important !
             material: new Cesium.PolylineGlowMaterialProperty({
                 glowPower: 0.2,
                 color: voyage.couleur
