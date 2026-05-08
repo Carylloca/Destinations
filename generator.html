@@ -159,6 +159,18 @@ function ajouterEtape() {
 
     div.map = map;
     div.marker = null;
+
+    // ➕ NOUVEAU : double‑clic pour placer un point
+    map.on("dblclick", function(e) {
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+
+        div.querySelector(".lat").value = lat;
+        div.querySelector(".lon").value = lon;
+
+        if (div.marker) div.map.removeLayer(div.marker);
+        div.marker = L.marker([lat, lon]).addTo(div.map);
+    });
 }
 
 async function rechercherCoordonnees(input) {
