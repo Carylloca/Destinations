@@ -7,7 +7,7 @@
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: #f4f6f9;
+        background: #eef2f7;
         margin: 0;
         padding: 20px;
     }
@@ -72,25 +72,7 @@
 <h2>🧭 Générateur de voyages CesiumJS</h2>
 
 <div class="card">
-    <h3>Informations du voyage</h3>
-
-    <label>Nom du voyage :</label><br>
-    <input id="nomVoyage" placeholder="Ex: Vol Genève → Papeete"><br>
-
-    <label>Type de voyage :</label><br>
-    <select id="typeVoyage">
-        <option value="avion">Avion</option>
-        <option value="bateau">Bateau</option>
-        <option value="voiture">Voiture</option>
-        <option value="train">Train</option>
-    </select><br>
-
-    <label>Couleur du voyage :</label><br>
-    <input id="couleurVoyage" value="#3498db"><br>
-</div>
-
-<div class="card">
-    <h3>Étapes</h3>
+    <h3>Étapes du voyage</h3>
     <div id="etapes"></div>
     <button onclick="ajouterEtape()">➕ Ajouter une étape</button>
 </div>
@@ -106,6 +88,24 @@
 <script>
 let compteur = 0;
 
+// Couleurs automatiques selon le type de transport
+const couleursTransport = {
+    avion: "#3498db",
+    bateau: "#1abc9c",
+    voiture: "#f1c40f",
+    train: "#9b59b6",
+    marche: "#2ecc71"
+};
+
+// Hauteur des arcs selon le transport
+const hauteurTransport = {
+    avion: 400000,
+    bateau: 20000,
+    voiture: 10000,
+    train: 15000,
+    marche: 5000
+};
+
 function ajouterEtape() {
     compteur++;
     const div = document.createElement("div");
@@ -118,11 +118,21 @@ function ajouterEtape() {
 
         <input placeholder="Lieu (ex: Paris CDG)" class="lieu" onblur="rechercherCoordonnees(this)"><br>
 
-        <select class="type">
+        <label>Type d'étape :</label><br>
+        <select class="typeEtape">
             <option value="depart">Départ</option>
             <option value="escale">Escale</option>
             <option value="etape">Étape</option>
             <option value="arrivee">Arrivée</option>
+        </select><br>
+
+        <label>Transport :</label><br>
+        <select class="transport">
+            <option value="avion">✈️ Avion</option>
+            <option value="bateau">🚢 Bateau</option>
+            <option value="voiture">🚗 Voiture</option>
+            <option value="train">🚄 Train</option>
+            <option value="marche">🚶 Marche</option>
         </select><br>
 
         <input placeholder="Longitude" class="lon"><br>
@@ -163,7 +173,6 @@ async function rechercherCoordonnees(input) {
     parent.querySelector(".lon").value = lon;
     parent.querySelector(".lat").value = lat;
 
-    // Mise à jour de la mini carte
     parent.map.setView([lat, lon], 8);
 
     if (parent.marker) parent.map.removeLayer(parent.marker);
@@ -171,33 +180,25 @@ async function rechercherCoordonnees(input) {
 }
 
 function genererCode() {
-    const nom = document.getElementById("nomVoyage").value;
-    const type = document.getElementById("typeVoyage").value;
-    const couleur = document.getElementById("couleurVoyage").value;
-
     const etapesDiv = document.querySelectorAll(".etape");
 
     let etapes = [];
 
     etapesDiv.forEach(e => {
-        etapes.push([
-            e.querySelector(".lieu").value,
-            e.querySelector(".type").value,
-            parseFloat(e.querySelector(".lon").value),
-            parseFloat(e.querySelector(".lat").value),
-            e.querySelector(".lien").value,
-            e.querySelector(".photo").value
-        ]);
+        etapes.push({
+            nom: e.querySelector(".lieu").value,
+            typeEtape: e.querySelector(".typeEtape").value,
+            transport: e.querySelector(".transport").value,
+            lon: parseFloat(e.querySelector(".lon").value),
+            lat: parseFloat(e.querySelector(".lat").value),
+            lien: e.querySelector(".lien").value,
+            photo: e.querySelector(".photo").value,
+            couleur: couleursTransport[e.querySelector(".transport").value],
+            hauteurArc: hauteurTransport[e.querySelector(".transport").value]
+        });
     });
 
-    const code = `
-{
-    nom: "${nom}",
-    type: "${type}",
-    couleur: Cesium.Color.fromCssColorString("${couleur}"),
-    etapes: ${JSON.stringify(etapes, null, 4)}
-},
-`;
+    const code = JSON.stringify(etapes, null, 4);
 
     document.getElementById("output").value = code;
 }
