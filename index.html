@@ -10,20 +10,12 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
 
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-        #cesiumContainer {
+        html, body, #cesiumContainer {
             width: 100%;
             height: 100%;
-            display: block;
-        }
-        .cesium-infoBox-description {
-            font-size: 14px;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -32,129 +24,116 @@
 <div id="cesiumContainer"></div>
 
 <script>
-    // 🔑 Mets ici ta clé Cesium ion (obligatoire)
-    Cesium.Ion.defaultAccessToken = "TA_CLE_CESIUM_ION_ICI";
+/* ---------------------------------------------------
+   🔑 TA CLÉ CESIUM ION (intégrée)
+--------------------------------------------------- */
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g";
 
-    // 🌍 Initialisation du globe en 3D forcée
-    const viewer = new Cesium.Viewer("cesiumContainer", {
-        terrainProvider: Cesium.createWorldTerrain(),
-        sceneMode: Cesium.SceneMode.SCENE3D,          // force le mode globe 3D
-        scene3DOnly: true,                            // désactive 2D / Columbus
-        animation: false,
-        timeline: false,
-        geocoder: false,
-        homeButton: true,
-        sceneModePicker: false,
-        baseLayerPicker: true,
-        navigationHelpButton: false,
-        fullscreenButton: true
-    });
+/* ---------------------------------------------------
+   🌍 Initialisation du globe 3D
+--------------------------------------------------- */
+const viewer = new Cesium.Viewer("cesiumContainer", {
+    terrainProvider: Cesium.createWorldTerrain(),
+    sceneMode: Cesium.SceneMode.SCENE3D,   // force le globe 3D
+    scene3DOnly: true,                     // désactive 2D et Columbus
+    animation: false,
+    timeline: false,
+    geocoder: false,
+    sceneModePicker: false,
+    navigationHelpButton: false,
+    baseLayerPicker: true
+});
 
-    // Caméra initiale (vue globale)
-    viewer.scene.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(10, 30, 20000000),
-        orientation: {
-            heading: Cesium.Math.toRadians(0),
-            pitch: Cesium.Math.toRadians(-35),
-            roll: 0.0
-        }
-    });
-
-    // 🌍 Tes voyages (tu peux en ajouter autant que tu veux)
-    const voyages = [
-        {
-            nom: "Italie 2022",
-            couleur: Cesium.Color.fromCssColorString("#e63946"),
-            etapes: [
-                { nom: "Lausanne (Départ)", coords: [6.6323, 46.5197] }, // [lon, lat]
-                { nom: "Milan", coords: [9.19, 45.4642] },
-                { nom: "Florence", coords: [11.2558, 43.7696] },
-                { nom: "Rome", coords: [12.4964, 41.9028] }
-            ]
-        },
-        {
-            nom: "Portugal 2023",
-            couleur: Cesium.Color.fromCssColorString("#1d3557"),
-            etapes: [
-                { nom: "Genève (Départ)", coords: [6.1432, 46.2044] },
-                { nom: "Porto", coords: [-8.6291, 41.1579] },
-                { nom: "Lisbonne", coords: [-9.1393, 38.7223] }
-            ]
-        }
-        // ➜ Tu peux ajouter ici d'autres voyages
-        /*
-        {
-            nom: "Nom du voyage",
-            couleur: Cesium.Color.fromCssColorString("#HEX"),
-            etapes: [
-                { nom: "Départ", coords: [lon, lat] },
-                { nom: "Étape 2", coords: [lon, lat] },
-                { nom: "Étape 3", coords: [lon, lat] }
-            ]
-        },
-        */
-    ];
-
-    // 🎨 Styles départ / étapes
-    const couleurDepart = Cesium.Color.LIME.withAlpha(0.95);
-    const couleurEtape = Cesium.Color.RED.withAlpha(0.9);
-
-    // Ajout d’un voyage sur le globe
-    function ajouterVoyage(voyage) {
-        const positions = [];
-
-        voyage.etapes.forEach((etape, index) => {
-            const lon = etape.coords[0];
-            const lat = etape.coords[1];
-
-            const position = Cesium.Cartesian3.fromDegrees(lon, lat);
-            positions.push(position);
-
-            const isDepart = index === 0;
-
-            viewer.entities.add({
-                position: position,
-                point: {
-                    pixelSize: isDepart ? 14 : 10,
-                    color: isDepart ? couleurDepart : couleurEtape,
-                    outlineColor: Cesium.Color.WHITE,
-                    outlineWidth: 2
-                },
-                label: {
-                    text: etape.nom,
-                    font: "14px sans-serif",
-                    fillColor: Cesium.Color.WHITE,
-                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                    outlineWidth: 2,
-                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                    pixelOffset: new Cesium.Cartesian2(0, -18),
-                    disableDepthTestDistance: Number.POSITIVE_INFINITY
-                },
-                description: `
-                    <h3>${voyage.nom}</h3>
-                    <p><b>Étape :</b> ${etape.nom}</p>
-                `
-            });
-        });
-
-        // Ligne lumineuse du voyage
-        viewer.entities.add({
-            polyline: {
-                positions: positions,
-                width: 3,
-                material: new Cesium.PolylineGlowMaterialProperty({
-                    glowPower: 0.2,
-                    color: voyage.couleur
-                })
-            }
-        });
+/* ---------------------------------------------------
+   📌 Voyages (exemples)
+   ➜ Tu peux en ajouter 20, 30, 50…
+--------------------------------------------------- */
+const voyages = [
+    {
+        nom: "Italie 2022",
+        couleur: Cesium.Color.fromCssColorString("#e63946"),
+        etapes: [
+            { nom: "Lausanne (Départ)", coords: [6.6323, 46.5197] },
+            { nom: "Milan", coords: [9.19, 45.4642] },
+            { nom: "Florence", coords: [11.2558, 43.7696] },
+            { nom: "Rome", coords: [12.4964, 41.9028] }
+        ]
+    },
+    {
+        nom: "Portugal 2023",
+        couleur: Cesium.Color.fromCssColorString("#1d3557"),
+        etapes: [
+            { nom: "Genève (Départ)", coords: [6.1432, 46.2044] },
+            { nom: "Porto", coords: [-8.6291, 41.1579] },
+            { nom: "Lisbonne", coords: [-9.1393, 38.7223] }
+        ]
     }
+];
 
-    // Ajout de tous les voyages
-    voyages.forEach(ajouterVoyage);
+/* ---------------------------------------------------
+   🎨 Styles
+--------------------------------------------------- */
+const couleurDepart = Cesium.Color.LIME.withAlpha(0.95);
+const couleurEtape = Cesium.Color.RED.withAlpha(0.9);
 
-    // Zoom automatique sur tous les trajets
-    viewer.zoomTo(viewer.entities);
+/* ---------------------------------------------------
+   ✈️ Fonction d’ajout d’un voyage
+--------------------------------------------------- */
+function ajouterVoyage(voyage) {
+    const positions = [];
+
+    voyage.etapes.forEach((etape, index) => {
+        const [lon, lat] = etape.coords;
+        const pos = Cesium.Cartesian3.fromDegrees(lon, lat);
+        positions.push(pos);
+
+        viewer.entities.add({
+            position: pos,
+            point: {
+                pixelSize: index === 0 ? 14 : 10,
+                color: index === 0 ? couleurDepart : couleurEtape,
+                outlineColor: Cesium.Color.WHITE,
+                outlineWidth: 2
+            },
+            label: {
+                text: etape.nom,
+                font: "14px sans-serif",
+                fillColor: Cesium.Color.WHITE,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -18),
+                disableDepthTestDistance: Number.POSITIVE_INFINITY
+            },
+            description: `
+                <h3>${voyage.nom}</h3>
+                <p><b>Étape :</b> ${etape.nom}</p>
+            `
+        });
+    });
+
+    // Ligne lumineuse
+    viewer.entities.add({
+        polyline: {
+            positions: positions,
+            width: 3,
+            material: new Cesium.PolylineGlowMaterialProperty({
+                glowPower: 0.2,
+                color: voyage.couleur
+            })
+        }
+    });
+}
+
+/* ---------------------------------------------------
+   ➕ Ajout de tous les voyages
+--------------------------------------------------- */
+voyages.forEach(ajouterVoyage);
+
+/* ---------------------------------------------------
+   🔍 Zoom automatique
+--------------------------------------------------- */
+viewer.zoomTo(viewer.entities);
 </script>
 
 </body>
