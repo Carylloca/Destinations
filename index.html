@@ -5,7 +5,7 @@
     <title>Globe 3D - Voyages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CesiumJS -->
+    <!-- CesiumJS 1.113 -->
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
 
@@ -39,7 +39,7 @@ Cesium.Ion.defaultAccessToken =
 // 🌍 Initialisation du globe 3D
 // ---------------------------------------------------
 const viewer = new Cesium.Viewer("cesiumContainer", {
-    terrainProvider: Cesium.createWorldTerrain(),
+    terrain: Cesium.Terrain.fromWorldTerrain(),   // ✔ nouvelle API
     sceneMode: Cesium.SceneMode.SCENE3D,
     scene3DOnly: true,
     animation: false,
