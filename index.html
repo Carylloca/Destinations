@@ -7,15 +7,6 @@
 
     <!-- CesiumJS 1.113 -->
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cesium.com/downloads/cesi<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Globe 3D - Voyages</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- CesiumJS 1.113 -->
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
 
     <style>
@@ -60,37 +51,39 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 
 // ---------------------------------------------------
-// 📌 Voyages (avec photos + liens)
+// 📌 Voyages (avec escales avion)
 // ---------------------------------------------------
 const voyages = [
     {
-        nom: "Italie 2022",
-        couleur: Cesium.Color.fromCssColorString("#e63946"),
+        nom: "Vol Genève → Papeete",
+        couleur: Cesium.Color.fromCssColorString("#3498db"), // couleur des arcs avion
         etapes: [
             {
-                nom: "Genève aéroport (Départ)",
-                coords: [6.110271, 46.231334 ],
-                lien: "https://google.com",
+                nom: "Genève Aéroport (Départ)",
+                type: "depart",
+                coords: [6.110271, 46.231334],
+                lien: "https://www.gva.ch",
                 photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lausanne_City.jpg/640px-Lausanne_City.jpg"
             },
             {
-                nom: "Paris Charles de Gaules",
+                nom: "Paris Charles de Gaulle (Escale)",
+                type: "escale",
                 coords: [2.577927, 49.003483],
-                lien: "https://fr.wikipedia.org/wiki/Milan",
+                lien: "https://www.parisaeroport.fr",
                 photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Milan_Duomo.jpg/640px-Milan_Duomo.jpg"
-            }
-
+            },
             {
-                nom: "Los Angeles Californie",
-                coords: [33.946598052978516, -118.40119171142578],
-                lien: "https://fr.wikipedia.org/wiki/Milan",
+                nom: "Los Angeles (Escale)",
+                type: "escale",
+                coords: [-118.40119171142578, 33.946598052978516],
+                lien: "https://www.flylax.com",
                 photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Milan_Duomo.jpg/640px-Milan_Duomo.jpg"
-            }
-        
+            },
             {
-                nom: "PApeete Faaa",
-                coords: [-17.53733, -149.5665],
-                lien: "https://fr.wikipedia.org/wiki/Milan",
+                nom: "Papeete Faaa (Arrivée)",
+                type: "etape",
+                coords: [-149.5665, -17.53733],
+                lien: "https://www.tahiti-aeroport.pf",
                 photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Milan_Duomo.jpg/640px-Milan_Duomo.jpg"
             }
         ]
@@ -100,11 +93,12 @@ const voyages = [
 // ---------------------------------------------------
 // 🎨 Styles
 // ---------------------------------------------------
-const couleurDepart = Cesium.Color.LIME.withAlpha(0.95);
-const couleurEtape = Cesium.Color.RED.withAlpha(0.9);
+const styleDepart = Cesium.Color.LIME.withAlpha(0.95);
+const styleEscale = Cesium.Color.CYAN.withAlpha(0.95);
+const styleEtape = Cesium.Color.RED.withAlpha(0.95);
 
 // ---------------------------------------------------
-// ✈️ Fonction pour créer un arc 3D entre deux points
+// ✈️ Fonction pour créer un arc 3D
 // ---------------------------------------------------
 function arc3D(lon1, lat1, lon2, lat2, hauteur = 500000) {
     const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
@@ -116,14 +110,18 @@ function arc3D(lon1, lat1, lon2, lat2, hauteur = 500000) {
     for (let i = 0; i <= steps; i++) {
         const t = i / steps;
 
-        // interpolation sphérique
         const cart = Cesium.Cartesian3.lerp(p1, p2, t, new Cesium.Cartesian3());
-
-        // on ajoute une hauteur pour créer l'arc
         const carto = Cesium.Cartographic.fromCartesian(cart);
+
         carto.height = Math.sin(Math.PI * t) * hauteur;
 
-        cartesians.push(Cesium.Cartesian3.fromRadians(carto.longitude, carto.latitude, carto.height));
+        cartesians.push(
+            Cesium.Cartesian3.fromRadians(
+                carto.longitude,
+                carto.latitude,
+                carto.height
+            )
+        );
     }
 
     return cartesians;
@@ -135,17 +133,20 @@ function arc3D(lon1, lat1, lon2, lat2, hauteur = 500000) {
 function ajouterVoyage(voyage) {
     let last = null;
 
-    voyage.etapes.forEach((etape, index) => {
+    voyage.etapes.forEach((etape) => {
         const [lon, lat] = etape.coords;
 
-        // Points légèrement au-dessus du sol
         const pos = Cesium.Cartesian3.fromDegrees(lon, lat, 2000);
+
+        let color = styleEtape;
+        if (etape.type === "depart") color = styleDepart;
+        if (etape.type === "escale") color = styleEscale;
 
         viewer.entities.add({
             position: pos,
             point: {
-                pixelSize: index === 0 ? 14 : 10,
-                color: index === 0 ? couleurDepart : couleurEtape,
+                pixelSize: 12,
+                color: color,
                 outlineColor: Cesium.Color.WHITE,
                 outlineWidth: 2
             },
@@ -167,7 +168,6 @@ function ajouterVoyage(voyage) {
             `
         });
 
-        // Si ce n'est pas la première étape → tracer un arc
         if (last) {
             const arc = arc3D(last[0], last[1], lon, lat, 400000);
 
@@ -185,146 +185,6 @@ function ajouterVoyage(voyage) {
         }
 
         last = [lon, lat];
-    });
-}
-
-// ---------------------------------------------------
-// ➕ Ajout de tous les voyages
-// ---------------------------------------------------
-voyages.forEach(ajouterVoyage);
-
-// ---------------------------------------------------
-// 🔍 Zoom automatique
-// ---------------------------------------------------
-viewer.zoomTo(viewer.entities);
-</script>
-
-</body>
-</html>
-umjs/releases/1.113/Build/Cesium/Cesium.js"></script>
-
-    <style>
-        html, body, #cesiumContainer {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        .popup-img {
-            width: 100%;
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
-    </style>
-</head>
-<body>
-
-<div id="cesiumContainer"></div>
-
-<script>
-// ---------------------------------------------------
-// 🔑 TA CLÉ CESIUM ION
-// ---------------------------------------------------
-Cesium.Ion.defaultAccessToken =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g";
-
-// ---------------------------------------------------
-// 🌍 Initialisation du globe 3D
-// ---------------------------------------------------
-const viewer = new Cesium.Viewer("cesiumContainer", {
-    terrain: Cesium.Terrain.fromWorldTerrain(),
-    sceneMode: Cesium.SceneMode.SCENE3D,
-    scene3DOnly: true,
-    animation: false,
-    timeline: false,
-    geocoder: false,
-    sceneModePicker: false,
-    navigationHelpButton: false,
-    baseLayerPicker: true
-});
-
-// ---------------------------------------------------
-// 📌 Voyages (avec photos + liens)
-// ---------------------------------------------------
-const voyages = [
-    {
-        nom: "Italie 2022",
-        couleur: Cesium.Color.fromCssColorString("#e63946"),
-        etapes: [
-            {
-                nom: "Lausanne (Départ)",
-                coords: [6.6323, 46.5197],
-                lien: "https://google.com",
-                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lausanne_City.jpg/640px-Lausanne_City.jpg"
-            },
-            {
-                nom: "Milan",
-                coords: [9.19, 45.4642],
-                lien: "https://fr.wikipedia.org/wiki/Milan",
-                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Milan_Duomo.jpg/640px-Milan_Duomo.jpg"
-            }
-        ]
-    }
-];
-
-// ---------------------------------------------------
-// 🎨 Styles
-// ---------------------------------------------------
-const couleurDepart = Cesium.Color.LIME.withAlpha(0.95);
-const couleurEtape = Cesium.Color.RED.withAlpha(0.9);
-
-// ---------------------------------------------------
-// ✈️ Ajout d’un voyage
-// ---------------------------------------------------
-function ajouterVoyage(voyage) {
-    const positions = [];
-
-    voyage.etapes.forEach((etape, index) => {
-        const [lon, lat] = etape.coords;
-
-        // ✔ On place les points 2000m au-dessus du terrain
-        const pos = Cesium.Cartesian3.fromDegrees(lon, lat, 2000);
-        positions.push(pos);
-
-        viewer.entities.add({
-            position: pos,
-            point: {
-                pixelSize: index === 0 ? 14 : 10,
-                color: index === 0 ? couleurDepart : couleurEtape,
-                outlineColor: Cesium.Color.WHITE,
-                outlineWidth: 2
-            },
-            label: {
-                text: etape.nom,
-                font: "14px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                outlineWidth: 2,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -18),
-                disableDepthTestDistance: Number.POSITIVE_INFINITY
-            },
-            description: `
-                <img src="${etape.photo}" class="popup-img">
-                <h3>${voyage.nom}</h3>
-                <p><b>Étape :</b> ${etape.nom}</p>
-                <p><a href="${etape.lien}" target="_blank">Ouvrir le lien externe</a></p>
-            `
-        });
-    });
-
-    // ✔ Ligne visible au-dessus du relief
-    viewer.entities.add({
-        polyline: {
-            positions: positions,
-            width: 3,
-            clampToGround: false, // important !
-            material: new Cesium.PolylineGlowMaterialProperty({
-                glowPower: 0.2,
-                color: voyage.couleur
-            })
-        }
     });
 }
 
