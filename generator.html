@@ -88,12 +88,12 @@
     <button onclick="genererCode()">🚀 Générer le code du voyage</button>
     <button onclick="ajouterAuCodeComplet()">➕ Ajouter au code complet</button>
     <button onclick="copierCode()">📋 Copier le code du voyage</button>
-    <button onclick="copierCodeComplet()">📋 Copier le code complet</button>
+    <button onclick="copierCodeComplet()">📋 Copier le code complet (index.html)</button>
 
     <h3>Code du voyage :</h3>
     <textarea id="output"></textarea>
 
-    <h3>Code complet (tous les voyages) :</h3>
+    <h3>Code complet (index.html prêt à coller) :</h3>
     <textarea id="outputComplet"></textarea>
 </div>
 
@@ -259,7 +259,48 @@ function ajouterAuCodeComplet() {
         etapes: etapes
     });
 
-    const codeComplet = JSON.stringify(voyagesAccumules, null, 4);
+    const codeComplet = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Globe 3D - Voyages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
+
+    <style>
+        html, body, #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .popup-img {
+            width: 100%;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="cesiumContainer"></div>
+
+<script>
+Cesium.Ion.defaultAccessToken = "TON_TOKEN_ION_ICI";
+
+const voyages = ${JSON.stringify(voyagesAccumules, null, 4)};
+
+${codeCesium()}
+</script>
+
+</body>
+</html>
+`;
+
     document.getElementById("outputComplet").value = codeComplet;
 }
 
@@ -274,245 +315,111 @@ function copierCodeComplet() {
     textarea.select();
     document.execCommand("copy");
 }
-</script>
 
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Générateur de voyages CesiumJS</title>
+function codeCesium() {
+return `
+const viewer = new Cesium.Viewer("cesiumContainer", {
+    terrain: Cesium.Terrain.fromWorldTerrain(),
+    sceneMode: Cesium.SceneMode.SCENE3D,
+    scene3DOnly: true,
+    animation: false,
+    timeline: false,
+    geocoder: false,
+    sceneModePicker: false,
+    navigationHelpButton: false,
+    baseLayerPicker: true
+});
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #eef2f7;
-        margin: 0;
-        padding: 20px;
-    }
-    h2, h3 {
-        color: #2c3e50;
-    }
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    input, select {
-        padding: 8px;
-        margin: 6px 0;
-        width: 300px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-    button {
-        padding: 10px 20px;
-        background: #3498db;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-    button:hover {
-        background: #2980b9;
-    }
-    .etape {
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 10px;
-        background: #fafafa;
-    }
-    textarea {
-        width: 100%;
-        height: 300px;
-        margin-top: 20px;
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .preview-map {
-        width: 100%;
-        height: 200px;
-        border-radius: 10px;
-        margin-top: 10px;
-    }
-</style>
-
-<!-- Leaflet pour la prévisualisation -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-</head>
-<body>
-
-<h2>🧭 Générateur de voyages CesiumJS</h2>
-
-<div class="card">
-    <h3>Informations du voyage</h3>
-
-    <label>Titre du voyage :</label><br>
-    <input id="titreVoyage" placeholder="Ex: Voyage en Polynésie 2025"><br>
-</div>
-
-<div class="card">
-    <h3>Étapes du voyage</h3>
-    <div id="etapes"></div>
-    <button onclick="ajouterEtape()">➕ Ajouter une étape</button>
-</div>
-
-<div class="card">
-    <button onclick="genererCode()">🚀 Générer le code CesiumJS</button>
-    <button onclick="copierCode()">📋 Copier le code</button>
-
-    <h3>Code généré :</h3>
-    <textarea id="output"></textarea>
-</div>
-
-<script>
-let compteur = 0;
-
-// Couleurs automatiques selon le type de transport
-const couleursTransport = {
-    avion: "#3498db",
-    bateau: "#1abc9c",
-    voiture: "#f1c40f",
-    train: "#9b59b6",
-    marche: "#2ecc71"
+const styleEtapes = {
+    depart: Cesium.Color.LIME.withAlpha(0.95),
+    escale: Cesium.Color.CYAN.withAlpha(0.95),
+    etape: Cesium.Color.RED.withAlpha(0.95),
+    arrivee: Cesium.Color.ORANGE.withAlpha(0.95)
 };
 
-// Hauteur des arcs selon le transport
-const hauteurTransport = {
-    avion: 400000,
-    bateau: 20000,
-    voiture: 10000,
-    train: 15000,
-    marche: 5000
-};
+function arc3D(lon1, lat1, lon2, lat2, hauteur) {
+    const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
+    const p2 = Cesium.Cartesian3.fromDegrees(lon2, lat2);
 
-function ajouterEtape() {
-    compteur++;
-    const div = document.createElement("div");
-    div.className = "etape";
+    const cartesians = [];
+    const steps = 64;
 
-    const id = "map" + compteur;
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
 
-    div.innerHTML = `
-        <h4>Étape ${compteur}</h4>
+        const cart = Cesium.Cartesian3.lerp(p1, p2, t, new Cesium.Cartesian3());
+        const carto = Cesium.Cartographic.fromCartesian(cart);
 
-        <input placeholder="Lieu (ex: Paris CDG)" class="lieu" onblur="rechercherCoordonnees(this)"><br>
+        carto.height = Math.sin(Math.PI * t) * hauteur;
 
-        <label>Type d'étape :</label><br>
-        <select class="typeEtape">
-            <option value="depart">Départ</option>
-            <option value="escale">Escale</option>
-            <option value="etape">Étape</option>
-            <option value="arrivee">Arrivée</option>
-        </select><br>
+        cartesians.push(
+            Cesium.Cartesian3.fromRadians(
+                carto.longitude,
+                carto.latitude,
+                carto.height
+            )
+        );
+    }
 
-        <label>Transport :</label><br>
-        <select class="transport">
-            <option value="avion">✈️ Avion</option>
-            <option value="bateau">🚢 Bateau</option>
-            <option value="voiture">🚗 Voiture</option>
-            <option value="train">🚄 Train</option>
-            <option value="marche">🚶 Marche</option>
-        </select><br>
-
-        <input placeholder="Longitude" class="lon"><br>
-        <input placeholder="Latitude" class="lat"><br>
-
-        <input placeholder="Lien externe" class="lien"><br>
-        <input placeholder="URL photo" class="photo"><br>
-
-        <div id="${id}" class="preview-map"></div>
-    `;
-
-    document.getElementById("etapes").appendChild(div);
-
-    // Mini carte Leaflet
-    const map = L.map(id).setView([0, 0], 2);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-    div.map = map;
-    div.marker = null;
-
-    // ➕ NOUVEAU : double‑clic pour placer un point
-    map.on("dblclick", function(e) {
-        const lat = e.latlng.lat;
-        const lon = e.latlng.lng;
-
-        div.querySelector(".lat").value = lat;
-        div.querySelector(".lon").value = lon;
-
-        if (div.marker) div.map.removeLayer(div.marker);
-        div.marker = L.marker([lat, lon]).addTo(div.map);
-    });
+    return cartesians;
 }
 
-async function rechercherCoordonnees(input) {
-    const lieu = input.value;
-    const parent = input.closest(".etape");
+function ajouterVoyage(voyage) {
+    let last = null;
 
-    if (!lieu) return;
+    voyage.etapes.forEach((etape) => {
+        const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
 
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(lieu)}`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.length === 0) return;
-
-    const lon = data[0].lon;
-    const lat = data[0].lat;
-
-    parent.querySelector(".lon").value = lon;
-    parent.querySelector(".lat").value = lat;
-
-    parent.map.setView([lat, lon], 8);
-
-    if (parent.marker) parent.map.removeLayer(parent.marker);
-    parent.marker = L.marker([lat, lon]).addTo(parent.map);
-}
-
-function genererCode() {
-    const titre = document.getElementById("titreVoyage").value;
-
-    const etapesDiv = document.querySelectorAll(".etape");
-
-    let etapes = [];
-
-    etapesDiv.forEach(e => {
-        etapes.push({
-            nom: e.querySelector(".lieu").value,
-            typeEtape: e.querySelector(".typeEtape").value,
-            transport: e.querySelector(".transport").value,
-            lon: parseFloat(e.querySelector(".lon").value),
-            lat: parseFloat(e.querySelector(".lat").value),
-            lien: e.querySelector(".lien").value,
-            photo: e.querySelector(".photo").value,
-            couleur: couleursTransport[e.querySelector(".transport").value],
-            hauteurArc: hauteurTransport[e.querySelector(".transport").value]
+        viewer.entities.add({
+            position: pos,
+            point: {
+                pixelSize: 12,
+                color: styleEtapes[etape.typeEtape] || Cesium.Color.WHITE,
+                outlineColor: Cesium.Color.WHITE,
+                outlineWidth: 2
+            },
+            label: {
+                text: etape.nom,
+                font: "14px sans-serif",
+                fillColor: Cesium.Color.WHITE,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -18),
+                disableDepthTestDistance: Number.POSITIVE_INFINITY
+            },
+            description: \`
+                <img src="\${etape.photo}" class="popup-img">
+                <h3>\${voyage.titre}</h3>
+                <p><b>Étape :</b> \${etape.nom}</p>
+                <p><b>Type :</b> \${etape.typeEtape}</p>
+                <p><b>Transport :</b> \${etape.transport}</p>
+                <p><a href="\${etape.lien}" target="_blank">Lien externe</a></p>
+            \`
         });
+
+        if (last) {
+            const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, etape.hauteurArc);
+
+            viewer.entities.add({
+                polyline: {
+                    positions: arc,
+                    width: 3,
+                    material: new Cesium.PolylineGlowMaterialProperty({
+                        glowPower: 0.2,
+                        color: Cesium.Color.fromCssColorString(etape.couleur)
+                    })
+                }
+            });
+        }
+
+        last = { lon: etape.lon, lat: etape.lat };
     });
-
-    const code = `
-{
-    titre: "${titre}",
-    etapes: ${JSON.stringify(etapes, null, 4)}
-},
-`;
-
-    document.getElementById("output").value = code;
 }
 
-function copierCode() {
-    const textarea = document.getElementById("output");
-    textarea.select();
-    document.execCommand("copy");
+voyages.forEach(ajouterVoyage);
+viewer.zoomTo(viewer.entities);
+`;
 }
 </script>
 
