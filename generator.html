@@ -72,7 +72,6 @@
 
 <div class="card">
     <h3>Informations du voyage</h3>
-
     <label>Titre du voyage :</label><br>
     <input id="titreVoyage" placeholder="Ex: Voyage en Polynésie 2025"><br>
 </div>
@@ -285,7 +284,7 @@ function ajouterAuCodeComplet() {
 <div id="cesiumContainer"></div>
 
 <script>
-Cesium.Ion.defaultAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g;
+Cesium.Ion.defaultAccessToken = "TA_CLE_CESIUM_ICI";
 
 const voyages = ${JSON.stringify(voyagesAccumules, null, 4)};
 
@@ -297,7 +296,9 @@ ${codeCesium()}
 `;
 
     document.getElementById("outputComplet").value = codeComplet;
-}function codeCesium() {
+}
+
+function codeCesium() {
 return String.raw`
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -403,8 +404,6 @@ viewer.zoomTo(viewer.entities);
 `;
 }
 </script>
+
 </body>
 </html>
-
-
-
