@@ -72,6 +72,13 @@
 <h2>🧭 Générateur de voyages CesiumJS</h2>
 
 <div class="card">
+    <h3>Informations du voyage</h3>
+
+    <label>Titre du voyage :</label><br>
+    <input id="titreVoyage" placeholder="Ex: Voyage en Polynésie 2025"><br>
+</div>
+
+<div class="card">
     <h3>Étapes du voyage</h3>
     <div id="etapes"></div>
     <button onclick="ajouterEtape()">➕ Ajouter une étape</button>
@@ -180,6 +187,8 @@ async function rechercherCoordonnees(input) {
 }
 
 function genererCode() {
+    const titre = document.getElementById("titreVoyage").value;
+
     const etapesDiv = document.querySelectorAll(".etape");
 
     let etapes = [];
@@ -198,7 +207,12 @@ function genererCode() {
         });
     });
 
-    const code = JSON.stringify(etapes, null, 4);
+    const code = `
+{
+    titre: "${titre}",
+    etapes: ${JSON.stringify(etapes, null, 4)}
+},
+`;
 
     document.getElementById("output").value = code;
 }
