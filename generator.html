@@ -62,7 +62,7 @@
     }
 </style>
 
-<!-- Leaflet pour la prévisualisation -->
+<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -101,7 +101,7 @@
 let compteur = 0;
 let voyagesAccumules = [];
 
-// Couleurs automatiques selon le type de transport
+// Couleurs automatiques selon le transport
 const couleursTransport = {
     avion: "#3498db",
     bateau: "#1abc9c",
@@ -110,7 +110,7 @@ const couleursTransport = {
     marche: "#2ecc71"
 };
 
-// Hauteur des arcs selon le transport
+// Hauteur des arcs
 const hauteurTransport = {
     avion: 400000,
     bateau: 20000,
@@ -159,7 +159,7 @@ function ajouterEtape() {
 
     document.getElementById("etapes").appendChild(div);
 
-    // Mini carte Leaflet
+    // Carte Leaflet
     const map = L.map(id).setView([0, 0], 2);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
@@ -317,7 +317,7 @@ function copierCodeComplet() {
 }
 
 function codeCesium() {
-return `
+return String.raw`
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
     sceneMode: Cesium.SceneMode.SCENE3D,
