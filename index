@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Voyages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .legend {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+
+        .legend div {
+            margin-bottom: 6px;
+        }
+
+        .color-box {
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+            margin-right: 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+<div class="legend" id="legend"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+/* ------------------------------
+   1) LISTE DE TES VOYAGES
+--------------------------------*/
+const voyages = [
+    {
+        nom: "Voyage en Italie 2022",
+        couleur: "#e63946",
+        etapes: [
+            { nom: "Lausanne", coords: [46.5197, 6.6323] },
+            { nom: "Milan", coords: [45.4642, 9.19] },
+            { nom: "Florence", coords: [43.7696, 11.2558] },
+            { nom: "Rome", coords: [41.9028, 12.4964] }
+        ]
+    },
+    {
+        nom: "USA 2019",
+        couleur: "#457b9d",
+        etapes: [
+            { nom: "New York", coords: [40.7128, -74.0060] },
+            { nom: "Washington", coords: [38.9072, -77.0369] },
+            { nom: "Miami", coords: [25.7617, -80.1918] }
+        ]
+    },
+    {
+        nom: "Espagne 2021",
+        couleur: "#f4a261",
+        etapes: [
+            { nom: "Barcelone", coords: [41.3851, 2.1734] },
+            { nom: "Valence", coords: [39.4699, -0.3763] },
+            { nom: "Madrid", coords: [40.4168, -3.7038] }
+        ]
+    }
+];
+
+/* ------------------------------
+   2) INITIALISATION DE LA CARTE
+--------------------------------*/
+const map = L.map('map').setView([20, 0], 2);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+}).addTo(map);
+
+/* ------------------------------
+   3) AFFICHAGE DES VOYAGES
+--------------------------------*/
+const legend = document.getElementById("legend");
+
+voyages.forEach(voyage => {
+    // Ajout dans la légende
+    legend.innerHTML += `
+        <div>
+            <span class="color-box" style="background:${voyage.couleur}"></span>
+            ${voyage.nom}
+        </div>
+    `;
+
+    // Marqueurs
+    voyage.etapes.forEach(etape => {
+        L.marker(etape.coords)
+            .addTo(map)
+            .bindPopup(`<b>${etape.nom}</b><br>${voyage.nom}`);
+    });
+
+    // Tracé de l'itinéraire
+    const ligne = L.polyline(
+        voyage.etapes.map(e => e.coords),
+        { color: voyage.couleur, weight: 4 }
+    ).addTo(map);
+});
+</script>
+
+</body>
+</html>
