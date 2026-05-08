@@ -17,6 +17,11 @@
             padding: 0;
             overflow: hidden;
         }
+        .popup-img {
+            width: 100%;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -27,7 +32,8 @@
 /* ---------------------------------------------------
    🔑 TA CLÉ CESIUM ION
 --------------------------------------------------- */
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g";
+Cesium.Ion.defaultAccessToken =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjNTQ5YjU4ZC01NTRhLTQyMTUtYTA0ZS03ZDJhNGY4NDhlNjYiLCJpZCI6NDI4ODQ0LCJpc3MiOiJodHRwczovL2lvbi5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3NzgyMzg5ODF9.kHnqmrD5om952taZbrX2YAUW8ACBpKuX6BsxrdfzW2g";
 
 /* ---------------------------------------------------
    🌍 Initialisation du globe 3D
@@ -45,26 +51,37 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 
 /* ---------------------------------------------------
-   📌 Voyages (avec liens externes)
+   📌 Voyages (avec photos + liens)
 --------------------------------------------------- */
 const voyages = [
     {
         nom: "Italie 2022",
         couleur: Cesium.Color.fromCssColorString("#e63946"),
         etapes: [
-            { nom: "Lausanne (Départ)", coords: [6.6323, 46.5197], lien: "https://google.com" },
-            { nom: "Milan", coords: [9.19, 45.4642], lien: "https://fr.wikipedia.org/wiki/Milan" },
-            { nom: "Florence", coords: [11.2558, 43.7696], lien: "https://fr.wikipedia.org/wiki/Florence" },
-            { nom: "Rome", coords: [12.4964, 41.9028], lien: "https://fr.wikipedia.org/wiki/Rome" }
-        ]
-    },
-    {
-        nom: "Portugal 2023",
-        couleur: Cesium.Color.fromCssColorString("#1d3557"),
-        etapes: [
-            { nom: "Genève (Départ)", coords: [6.1432, 46.2044], lien: "https://google.com" },
-            { nom: "Porto", coords: [-8.6291, 41.1579], lien: "https://fr.wikipedia.org/wiki/Porto" },
-            { nom: "Lisbonne", coords: [-9.1393, 38.7223], lien: "https://fr.wikipedia.org/wiki/Lisbonne" }
+            {
+                nom: "Lausanne (Départ)",
+                coords: [6.6323, 46.5197],
+                lien: "https://google.com",
+                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lausanne_City.jpg/640px-Lausanne_City.jpg"
+            },
+            {
+                nom: "Milan",
+                coords: [9.19, 45.4642],
+                lien: "https://fr.wikipedia.org/wiki/Milan",
+                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Milan_Duomo.jpg/640px-Milan_Duomo.jpg"
+            },
+            {
+                nom: "Florence",
+                coords: [11.2558, 43.7696],
+                lien: "https://fr.wikipedia.org/wiki/Florence",
+                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Florence_skyline.jpg/640px-Florence_skyline.jpg"
+            },
+            {
+                nom: "Rome",
+                coords: [12.4964, 41.9028],
+                lien: "https://fr.wikipedia.org/wiki/Rome",
+                photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Colosseo_2020.jpg/640px-Colosseo_2020.jpg"
+            }
         ]
     }
 ];
@@ -105,6 +122,7 @@ function ajouterVoyage(voyage) {
                 disableDepthTestDistance: Number.POSITIVE_INFINITY
             },
             description: `
+                <img src="${etape.photo}" class="popup-img">
                 <h3>${voyage.nom}</h3>
                 <p><b>Étape :</b> ${etape.nom}</p>
                 <p><a href="${etape.lien}" target="_blank">Ouvrir le lien externe</a></p>
