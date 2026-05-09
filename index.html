@@ -9,7 +9,7 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
 
     <style>
-        html, body, #cesiumContainer {
+        html, body {
             width: 100%;
             height: 100%;
             margin: 0;
@@ -17,79 +17,81 @@
             overflow: hidden;
         }
 
-        #menuVoyages {
+        #cesiumContainer {
             position: absolute;
+            inset: 0;
+        }
+
+        #menuVoyages {
+            position: fixed;
             top: 10px;
             left: 10px;
-            background: rgba(255,255,255,0.85);
-            padding: 12px 18px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 14px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-family: Arial;
-            max-width: 280px;
-            max-height: 300px;
+            font-family: Arial, sans-serif;
+            max-width: 260px;
+            max-height: 260px;
             overflow-y: auto;
             z-index: 9999;
         }
 
         #voyagesList {
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .voyage-item {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             gap: 6px;
+            font-size: 13px;
         }
 
         .miniature {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             object-fit: cover;
             border: 1px solid #ccc;
         }
 
         .color-dot {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             border: 1px solid #333;
             display: inline-block;
-            margin-right: 6px;
         }
 
         .center-btn {
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             margin-left: auto;
         }
     </style>
 </head>
 <body>
 
-<!-- 📌 MENU DÉROULANT DES VOYAGES -->
+<div id="cesiumContainer"></div>
+
 <div id="menuVoyages">
-    <h3 style="margin-top:0; color:#2c3e50; cursor:pointer;" onclick="toggleMenu()">
+    <h3 style="margin:0 0 6px 0; color:#2c3e50; font-size:15px; cursor:pointer;" onclick="toggleMenu()">
         📌 Voyages chargés ▼
     </h3>
 
     <div id="voyagesList"></div>
 
-    <button onclick="cocherTout()">Cocher tout</button>
-    <button onclick="decocherTout()">Décocher tout</button>
+    <button onclick="cocherTout()" style="margin-top:6px;">Cocher tout</button>
+    <button onclick="decocherTout()" style="margin-top:6px;">Décocher tout</button>
 </div>
 
-<div id="cesiumContainer"></div>
-
 <script>
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
+Cesium.Ion.defaultAccessToken = "TON_TOKEN_ICI";
 
-// 🟨🟨🟨 ZONE DE COLLAGE DU CODE DE VOYAGE 🟨🟨🟨
-
+// 🟨 ZONE DE COLLAGE DES VOYAGES 🟨
 const voyages = [
-
     {
         "titre": "Ile Maurice 2025 - 2026",
         "couleurVoyage": "#e67e22",
@@ -100,6 +102,7 @@ const voyages = [
                 "transport": "avion",
                 "lon": 6.1102707,
                 "lat": 46.2313343,
+                "lien": "",
                 "photo": "",
                 "couleur": "#3498db",
                 "hauteurArc": 400000
@@ -108,32 +111,26 @@ const voyages = [
                 "nom": "Aéroport Ile Maurice",
                 "typeEtape": "etape",
                 "transport": "avion",
-                "lon": 57.681484,
-                "lat": -20.434035,
+                "lon": 57.68148422241212,
+                "lat": -20.434035499044324,
+                "lien": "",
                 "photo": "",
                 "couleur": "#3498db",
                 "hauteurArc": 400000
             }
         ]
     }
-
 ];
+// 🟨 FIN ZONE DE COLLAGE 🟨
 
-// 🟨🟨🟨 FIN DE LA ZONE DE COLLAGE 🟨🟨🟨
 
-
-// === INTERFACE : CASES À COCHER + MINIATURES + COULEURS ===
-
+// === INTERFACE : LISTE, MINIATURES, COULEURS ===
 const groupesCesium = [];
 const listeDiv = document.getElementById("voyagesList");
 
 voyages.forEach((v, index) => {
-
-    // Trouver une miniature
     let miniature = v.etapes.find(e => e.photo && e.photo.trim() !== "");
-    let img = miniature ? miniature.photo : "https://via.placeholder.com/40?text=📍";
-
-    // Couleur du voyage
+    let img = miniature ? miniature.photo : "https://via.placeholder.com/32?text=📍";
     let couleur = v.couleurVoyage || "#3498db";
 
     const div = document.createElement("div");
@@ -152,14 +149,11 @@ voyages.forEach((v, index) => {
     listeDiv.appendChild(div);
 });
 
-// ✔️ Cocher tous les voyages au démarrage
+// Cocher et afficher tous les voyages au démarrage
 document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
     cb.checked = true;
     afficherVoyage(i);
 });
-
-
-// === MENU DÉROULANT ===
 
 function toggleMenu() {
     const div = document.getElementById("voyagesList");
@@ -181,8 +175,7 @@ function decocherTout() {
 }
 
 
-// === CODE CESIUM ===
-
+// === CESIUM ===
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
     animation: false,
@@ -230,9 +223,6 @@ function arc3D(lon1, lat1, lon2, lat2, hauteur) {
 
     return cartesians;
 }
-
-
-// === AFFICHAGE / SUPPRESSION DES VOYAGES ===
 
 function toggleVoyage(index, afficher) {
     if (afficher) afficherVoyage(index);
@@ -303,9 +293,6 @@ function masquerVoyage(index) {
     groupesCesium[index] = [];
 }
 
-
-// === 🌍 CENTRER SUR UN VOYAGE ===
-
 function centrerVoyage(index) {
     const voyage = voyages[index];
 
@@ -326,7 +313,6 @@ function centrerVoyage(index) {
         destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, 800000)
     });
 }
-
 </script>
 
 </body>
