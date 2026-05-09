@@ -16,6 +16,24 @@
             padding: 0;
             overflow: hidden;
         }
+
+        #menuVoyages {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-family: Arial;
+            max-width: 260px;
+            z-index: 9999;
+        }
+
+        #voyagesList {
+            margin-top: 10px;
+        }
+
         .popup-img {
             width: 100%;
             border-radius: 6px;
@@ -25,31 +43,26 @@
 </head>
 <body>
 
-<!-- 📌 Liste des voyages -->
-<div style="
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(255,255,255,0.9);
-    padding: 12px 18px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    font-family: Arial;
-    max-width: 300px;
-">
-    <h3 style="margin-top:0; color:#2c3e50;">📌 Voyages chargés</h3>
-    <ul id="listeVoyages" style="padding-left: 20px; margin: 0;"></ul>
+<!-- 📌 MENU DÉROULANT DES VOYAGES -->
+<div id="menuVoyages">
+    <h3 style="margin-top:0; color:#2c3e50; cursor:pointer;" onclick="toggleMenu()">
+        📌 Voyages chargés ▼
+    </h3>
+
+    <div id="voyagesList"></div>
+
+    <button onclick="cocherTout()">Cocher tout</button>
+    <button onclick="decocherTout()">Décocher tout</button>
 </div>
 
 <div id="cesiumContainer"></div>
 
 <script>
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
+Cesium.Ion.defaultAccessToken = "TON_TOKEN_ICI";
 
 // 🟨🟨🟨 ZONE DE COLLAGE DU CODE DE VOYAGE 🟨🟨🟨
-// Colle ici un ou plusieurs voyages générés par generator.html
 
-    const voyages = [
+const voyages = [
 
     // ======= DÉBUT DU VOYAGE "Ile Maurice" =======
 
@@ -70,7 +83,7 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
             {
                 "nom": "Aéroport Ile Maurice",
                 "typeEtape": "etape",
-                "transport": "voiture",
+                "transport": "avion",
                 "lon": 57.68148422241212,
                 "lat": -20.434035499044324,
                 "lien": "",
@@ -103,13 +116,13 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
             {
                 "nom": "Ile Maurice",
                 "typeEtape": "depart",
-                "transport": "voiture",
+                "transport": "avion",
                 "lon": 57.68148422241212,
                 "lat": -20.434035499044324,
                 "lien": "",
                 "photo": "",
-                "couleur": "#f1c40f",
-                "hauteurArc": 10000
+                "couleur": "#3498db",
+                "hauteurArc": 400000
             },
             {
                 "nom": "Genève aéroport",
@@ -126,22 +139,46 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
     }
 
     // ======= FIN DU VOYAGE "Ile Maurice" =======
-    
 
-
-    
 ];
 
 // 🟨🟨🟨 FIN DE LA ZONE DE COLLAGE 🟨🟨🟨
 
 
-// 📌 Affichage des titres dans la liste
-const liste = document.getElementById("listeVoyages");
-voyages.forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = v.titre;
-    liste.appendChild(li);
+// === INTERFACE : CASES À COCHER ===
+
+const groupesCesium = [];
+const listeDiv = document.getElementById("voyagesList");
+
+voyages.forEach((v, index) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+        <label>
+            <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
+            ${v.titre}
+        </label>
+    `;
+    listeDiv.appendChild(div);
 });
+
+function toggleMenu() {
+    const div = document.getElementById("voyagesList");
+    div.style.display = div.style.display === "none" ? "block" : "none";
+}
+
+function cocherTout() {
+    document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
+        cb.checked = true;
+        afficherVoyage(i);
+    });
+}
+
+function decocherTout() {
+    document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
+        cb.checked = false;
+        masquerVoyage(i);
+    });
+}
 
 
 // === CODE CESIUM ===
@@ -158,7 +195,6 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     baseLayerPicker: true
 });
 
-// Centrer la vue sur la Suisse
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
 });
@@ -197,13 +233,24 @@ function arc3D(lon1, lat1, lon2, lat2, hauteur) {
     return cartesians;
 }
 
-function ajouterVoyage(voyage) {
+
+// === AFFICHAGE / SUPPRESSION DES VOYAGES ===
+
+function toggleVoyage(index, afficher) {
+    if (afficher) afficherVoyage(index);
+    else masquerVoyage(index);
+}
+
+function afficherVoyage(index) {
+    const voyage = voyages[index];
+    const groupe = [];
+
     let last = null;
 
     voyage.etapes.forEach((etape) => {
         const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
 
-        viewer.entities.add({
+        const point = viewer.entities.add({
             position: pos,
             point: {
                 pixelSize: 12,
@@ -220,21 +267,15 @@ function ajouterVoyage(voyage) {
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 pixelOffset: new Cesium.Cartesian2(0, -18),
                 disableDepthTestDistance: Number.POSITIVE_INFINITY
-            },
-            description: `
-                <img src="${etape.photo}" class="popup-img">
-                <h3>${voyage.titre}</h3>
-                <p><b>Étape :</b> ${etape.nom}</p>
-                <p><b>Type :</b> ${etape.typeEtape}</p>
-                <p><b>Transport :</b> ${etape.transport}</p>
-                <p><a href="${etape.lien}" target="_blank">Lien externe</a></p>
-            `
+            }
         });
+
+        groupe.push(point);
 
         if (last) {
             const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, etape.hauteurArc);
 
-            viewer.entities.add({
+            const ligne = viewer.entities.add({
                 polyline: {
                     positions: arc,
                     width: 3,
@@ -244,14 +285,26 @@ function ajouterVoyage(voyage) {
                     })
                 }
             });
+
+            groupe.push(ligne);
         }
 
         last = { lon: etape.lon, lat: etape.lat };
     });
+
+    groupesCesium[index] = groupe;
 }
 
-voyages.forEach(ajouterVoyage);
-viewer.zoomTo(viewer.entities);
+function masquerVoyage(index) {
+    if (!groupesCesium[index]) return;
+
+    groupesCesium[index].forEach(entite => {
+        viewer.entities.remove(entite);
+    });
+
+    groupesCesium[index] = [];
+}
+
 </script>
 
 </body>
