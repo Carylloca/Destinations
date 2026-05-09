@@ -26,7 +26,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             font-family: Arial;
-            max-width: 260px;
+            max-width: 280px;
             z-index: 9999;
         }
 
@@ -34,10 +34,34 @@
             margin-top: 10px;
         }
 
-        .popup-img {
-            width: 100%;
-            border-radius: 6px;
+        .voyage-item {
+            display: flex;
+            align-items: center;
             margin-bottom: 8px;
+            gap: 6px;
+        }
+
+        .miniature {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+
+        .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .center-btn {
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: auto;
         }
     </style>
 </head>
@@ -64,10 +88,9 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 const voyages = [
 
-    // ======= DÉBUT DU VOYAGE "Ile Maurice" =======
-
     {
         "titre": "Ile Maurice 2025 - 2026",
+        "couleurVoyage": "#e67e22",
         "etapes": [
             {
                 "nom": "Genève aéroport",
@@ -75,7 +98,6 @@ const voyages = [
                 "transport": "avion",
                 "lon": 6.1102707,
                 "lat": 46.2313343,
-                "lien": "",
                 "photo": "",
                 "couleur": "#3498db",
                 "hauteurArc": 400000
@@ -84,53 +106,8 @@ const voyages = [
                 "nom": "Aéroport Ile Maurice",
                 "typeEtape": "etape",
                 "transport": "avion",
-                "lon": 57.68148422241212,
-                "lat": -20.434035499044324,
-                "lien": "",
-                "photo": "",
-                "couleur": "#3498db",
-                "hauteurArc": 400000
-            },
-            {
-                "nom": "OUTRIGGER Mauritius Beach Resort",
-                "typeEtape": "etape",
-                "transport": "voiture",
-                "lon": 57.4174577,
-                "lat": -20.5107092,
-                "lien": "",
-                "photo": "",
-                "couleur": "#f1c40f",
-                "hauteurArc": 10000
-            },
-            {
-                "nom": "Hôtel: Canonnier Beachcomber",
-                "typeEtape": "etape",
-                "transport": "voiture",
-                "lon": 57.55462646484376,
-                "lat": -20.002240446031553,
-                "lien": "",
-                "photo": "",
-                "couleur": "#f1c40f",
-                "hauteurArc": 10000
-            },
-            {
-                "nom": "Ile Maurice",
-                "typeEtape": "etape",
-                "transport": "voiture",
-                "lon": 57.68148422241212,
-                "lat": -20.434035499044324,
-                "lien": "",
-                "photo": "",
-                "couleur": "#3498db",
-                "hauteurArc": 10000
-            },
-            {
-                "nom": "Genève aéroport",
-                "typeEtape": "arrivee",
-                "transport": "avion",
-                "lon": 6.1102707,
-                "lat": 46.2313343,
-                "lien": "",
+                "lon": 57.681484,
+                "lat": -20.434035,
                 "photo": "",
                 "couleur": "#3498db",
                 "hauteurArc": 400000
@@ -138,26 +115,38 @@ const voyages = [
         ]
     }
 
-    // ======= FIN DU VOYAGE "Ile Maurice" =======
-
 ];
 
 // 🟨🟨🟨 FIN DE LA ZONE DE COLLAGE 🟨🟨🟨
 
 
-// === INTERFACE : CASES À COCHER ===
+// === INTERFACE : CASES À COCHER + MINIATURES + COULEURS ===
 
 const groupesCesium = [];
 const listeDiv = document.getElementById("voyagesList");
 
 voyages.forEach((v, index) => {
+
+    // Trouver une miniature
+    let miniature = v.etapes.find(e => e.photo && e.photo.trim() !== "");
+    let img = miniature ? miniature.photo : "https://via.placeholder.com/40?text=📍";
+
+    // Couleur du voyage
+    let couleur = v.couleurVoyage || "#3498db";
+
     const div = document.createElement("div");
+    div.className = "voyage-item";
+
     div.innerHTML = `
+        <img src="${img}" class="miniature">
+        <span class="color-dot" style="background:${couleur}"></span>
         <label>
             <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
             ${v.titre}
         </label>
+        <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
     `;
+
     listeDiv.appendChild(div);
 });
 
@@ -166,6 +155,9 @@ document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) =
     cb.checked = true;
     afficherVoyage(i);
 });
+
+
+// === MENU DÉROULANT ===
 
 function toggleMenu() {
     const div = document.getElementById("voyagesList");
@@ -191,8 +183,6 @@ function decocherTout() {
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
-    sceneMode: Cesium.SceneMode.SCENE3D,
-    scene3DOnly: true,
     animation: false,
     timeline: false,
     geocoder: false,
@@ -309,6 +299,30 @@ function masquerVoyage(index) {
     });
 
     groupesCesium[index] = [];
+}
+
+
+// === 🌍 CENTRER SUR UN VOYAGE ===
+
+function centrerVoyage(index) {
+    const voyage = voyages[index];
+
+    let minLon = 999, maxLon = -999;
+    let minLat = 999, maxLat = -999;
+
+    voyage.etapes.forEach(e => {
+        minLon = Math.min(minLon, e.lon);
+        maxLon = Math.max(maxLon, e.lon);
+        minLat = Math.min(minLat, e.lat);
+        maxLat = Math.max(maxLat, e.lat);
+    });
+
+    const centerLon = (minLon + maxLon) / 2;
+    const centerLat = (minLat + maxLat) / 2;
+
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, 800000)
+    });
 }
 
 </script>
