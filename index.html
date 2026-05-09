@@ -161,6 +161,12 @@ voyages.forEach((v, index) => {
     listeDiv.appendChild(div);
 });
 
+    // Cocher tous les voyages au démarrage
+document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
+    cb.checked = true;
+    afficherVoyage(i);
+});
+
 function toggleMenu() {
     const div = document.getElementById("voyagesList");
     div.style.display = div.style.display === "none" ? "block" : "none";
