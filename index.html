@@ -58,7 +58,7 @@
 <div id="cesiumContainer"></div>
 
 <script>
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
+Cesium.Ion.defaultAccessToken = "TON_TOKEN_ICI";
 
 // 🟨🟨🟨 ZONE DE COLLAGE DU CODE DE VOYAGE 🟨🟨🟨
 
@@ -115,14 +115,14 @@ const voyages = [
             },
             {
                 "nom": "Ile Maurice",
-                "typeEtape": "depart",
-                "transport": "avion",
+                "typeEtape": "etape",
+                "transport": "voiture",
                 "lon": 57.68148422241212,
                 "lat": -20.434035499044324,
                 "lien": "",
                 "photo": "",
                 "couleur": "#3498db",
-                "hauteurArc": 400000
+                "hauteurArc": 10000
             },
             {
                 "nom": "Genève aéroport",
@@ -161,7 +161,7 @@ voyages.forEach((v, index) => {
     listeDiv.appendChild(div);
 });
 
-    // Cocher tous les voyages au démarrage
+// ✔️ Cocher tous les voyages au démarrage
 document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
     cb.checked = true;
     afficherVoyage(i);
