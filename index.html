@@ -26,7 +26,7 @@
             position: fixed;
             top: 10px;
             left: 10px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.90);
             padding: 10px 14px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -102,7 +102,6 @@ const voyages = [
                 "transport": "avion",
                 "lon": 6.1102707,
                 "lat": 46.2313343,
-                "lien": "",
                 "photo": "",
                 "couleur": "#3498db",
                 "hauteurArc": 400000
@@ -111,9 +110,8 @@ const voyages = [
                 "nom": "Aéroport Ile Maurice",
                 "typeEtape": "etape",
                 "transport": "avion",
-                "lon": 57.68148422241212,
-                "lat": -20.434035499044324,
-                "lien": "",
+                "lon": 57.681484,
+                "lat": -20.434035,
                 "photo": "",
                 "couleur": "#3498db",
                 "hauteurArc": 400000
@@ -130,7 +128,7 @@ const listeDiv = document.getElementById("voyagesList");
 
 voyages.forEach((v, index) => {
     let miniature = v.etapes.find(e => e.photo && e.photo.trim() !== "");
-    let img = miniature ? miniature.photo : "https://via.placeholder.com/32?text=📍";
+    let img = miniature ? miniature.photo : "https://placehold.co/32x32?text=📍";
     let couleur = v.couleurVoyage || "#3498db";
 
     const div = document.createElement("div");
@@ -147,12 +145,6 @@ voyages.forEach((v, index) => {
     `;
 
     listeDiv.appendChild(div);
-});
-
-// Cocher et afficher tous les voyages au démarrage
-document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
-    cb.checked = true;
-    afficherVoyage(i);
 });
 
 function toggleMenu() {
@@ -190,13 +182,8 @@ viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
 });
 
-const styleEtapes = {
-    depart: Cesium.Color.LIME.withAlpha(0.95),
-    escale: Cesium.Color.CYAN.withAlpha(0.95),
-    etape: Cesium.Color.RED.withAlpha(0.95),
-    arrivee: Cesium.Color.ORANGE.withAlpha(0.95)
-};
 
+// === AFFICHAGE DES VOYAGES ===
 function arc3D(lon1, lat1, lon2, lat2, hauteur) {
     const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
     const p2 = Cesium.Cartesian3.fromDegrees(lon2, lat2);
@@ -242,7 +229,7 @@ function afficherVoyage(index) {
             position: pos,
             point: {
                 pixelSize: 12,
-                color: styleEtapes[etape.typeEtape] || Cesium.Color.WHITE,
+                color: Cesium.Color.fromCssColorString(etape.couleur),
                 outlineColor: Cesium.Color.WHITE,
                 outlineWidth: 2
             },
@@ -313,6 +300,13 @@ function centrerVoyage(index) {
         destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, 800000)
     });
 }
+
+
+// === ✔️ AFFICHER TOUS LES VOYAGES APRÈS INITIALISATION DU VIEWER ===
+document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
+    cb.checked = true;
+    afficherVoyage(i);
+});
 </script>
 
 </body>
