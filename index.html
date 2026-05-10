@@ -425,21 +425,31 @@ if (etape.transport === "avion") {
     hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
 }
 
+// 🌊 Bateau → 200 m
+if (etape.transport === "bateau") {
+    hauteurArc = 200;
+}
+
+// 🚶 Marche → 500 m
+if (etape.transport === "marche") {
+    hauteurArc = 500;
+}
+
 const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
 
+const ligne = viewer.entities.add({
+    polyline: {
+        positions: arc,
+        width: 3,
+        material: new Cesium.PolylineGlowMaterialProperty({
+            glowPower: 0.2,
+            color: Cesium.Color.fromCssColorString(etape.couleur)
+        })
+    }
+});
 
-            const ligne = viewer.entities.add({
-                polyline: {
-                    positions: arc,
-                    width: 3,
-                    material: new Cesium.PolylineGlowMaterialProperty({
-                        glowPower: 0.2,
-                        color: Cesium.Color.fromCssColorString(etape.couleur)
-                    })
-                }
-            });
+groupe.push(ligne);
 
-            groupe.push(ligne);
         }
 
         last = { lon: etape.lon, lat: etape.lat };
