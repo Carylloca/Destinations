@@ -400,9 +400,6 @@ if (last) {
         hauteurArc = 500;
     }
 
-    // (optionnel) 🚗 Voiture → tu peux définir une valeur ici si tu veux
-    // if (etape.transport === "voiture") hauteurArc = 10000;
-
     const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
 
     const ligne = viewer.entities.add({
@@ -417,6 +414,12 @@ if (last) {
     });
 
     groupe.push(ligne);
+}
+
+last = { lon: etape.lon, lat: etape.lat };
+});
+
+groupesCesium[index] = groupe;
 }
 
 
