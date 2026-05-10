@@ -149,6 +149,7 @@ const voyages = [
 
  
 
+
 // ======= DÉBUT DU VOYAGE "Maldives 2014" =======
 
 {
@@ -202,8 +203,8 @@ const voyages = [
         "nom": "Nalaguraidhoo",
         "typeEtape": "escale",
         "transport": "bateau",
-        "lon": 72.8015332,
-        "lat": 3.483075,
+        "lon": 72.80165433883668,
+        "lat": 3.4879056160162913,
         "lien": "https://mesvoyages.ch/les-maldives/",
         "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/13.-les-maldives.jpg",
         "couleur": "#1abc9c",
@@ -213,8 +214,8 @@ const voyages = [
         "nom": "Nalaguraidhoo",
         "typeEtape": "arrivee",
         "transport": "marche",
-        "lon": 72.8015332,
-        "lat": 3.483075,
+        "lon": 72.80101060867311,
+        "lat": 3.480774423835113,
         "lien": "https://mesvoyages.ch/les-maldives/",
         "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/7.-les-maldives.jpg",
         "couleur": "#2ecc71",
@@ -224,6 +225,7 @@ const voyages = [
 }
 
 // ======= FIN DU VOYAGE "Maldives 2014" =======
+
 
 
 ];
@@ -323,6 +325,25 @@ function toggleVoyage(index, afficher) {
     if (afficher) afficherVoyage(index);
     else masquerVoyage(index);
 }
+function hauteurArcDynamique(lon1, lat1, lon2, lat2) {
+    // Calcul distance approximative en degrés
+    const dLon = Math.abs(lon2 - lon1);
+    const dLat = Math.abs(lat2 - lat1);
+
+    // Distance "brute"
+    const distance = Math.sqrt(dLon * dLon + dLat * dLat);
+
+    // Conversion en hauteur (scaling)
+    let hauteur = distance * 20000000; // facteur d'échelle
+
+    // Hauteur minimale
+    if (hauteur < 150000) hauteur = 150000;
+
+    // Hauteur maximale
+    if (hauteur > 400000) hauteur = 400000;
+
+    return hauteur;
+}
 
 function afficherVoyage(index) {
     const voyage = voyages[index];
@@ -356,7 +377,15 @@ function afficherVoyage(index) {
         groupe.push(point);
 
         if (last) {
-            const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, etape.hauteurArc);
+            let hauteurArc = etape.hauteurArc;
+
+// Si transport = avion → hauteur dynamique
+if (etape.transport === "avion") {
+    hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
+}
+
+const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
+
 
             const ligne = viewer.entities.add({
                 polyline: {
