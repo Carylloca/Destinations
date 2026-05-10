@@ -376,8 +376,43 @@ function afficherVoyage(index) {
 
         groupe.push(point);
 
-        if (last) {
-            let hauteurArc = etape.hauteurArc;
+if (last) {
+    let hauteurArc = etape.hauteurArc;
+
+    // ✈️ Avion → hauteur dynamique
+    if (etape.transport === "avion") {
+        hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
+    }
+
+    // 🌊 Bateau → 200 m
+    if (etape.transport === "bateau") {
+        hauteurArc = 200;
+    }
+
+    // 🚶 Marche → 500 m
+    if (etape.transport === "marche") {
+        hauteurArc = 500;
+    }
+
+    // (optionnel) 🚗 Voiture → tu peux définir une valeur ici si tu veux
+    // if (etape.transport === "voiture") hauteurArc = 10000;
+
+    const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
+
+    const ligne = viewer.entities.add({
+        polyline: {
+            positions: arc,
+            width: 3,
+            material: new Cesium.PolylineGlowMaterialProperty({
+                glowPower: 0.2,
+                color: Cesium.Color.fromCssColorString(etape.couleur)
+            })
+        }
+    });
+
+    groupe.push(ligne);
+}
+
 
 // Si transport = avion → hauteur dynamique
 if (etape.transport === "avion") {
@@ -438,13 +473,22 @@ function centrerVoyage(index) {
     // Distance approximative du voyage
     const delta = Math.max(maxLon - minLon, maxLat - minLat);
 
-    // Zoom automatique
-    const hauteur = 2000000 + (delta * 20000000);
+    // 🌍 Nouveau zoom PRO : stable, jamais extrême
+    // - petit voyage → 1.5M
+    // - moyen → 3M
+    // - grand → 6M
+    // - très grand → max 12M
+    let hauteur = 1500000 * (1 + Math.log10(1 + delta * 50));
+
+    // Limites de sécurité
+    if (hauteur < 1500000) hauteur = 1500000;
+    if (hauteur > 12000000) hauteur = 12000000;
 
     viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, hauteur)
     });
 }
+
 
 
 // === ✔️ AFFICHER TOUS LES VOYAGES APRÈS INITIALISATION DU VIEWER ===
