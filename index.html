@@ -354,25 +354,31 @@ function afficherVoyage(index) {
     voyage.etapes.forEach((etape) => {
         const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
 
-        const point = viewer.entities.add({
-            position: pos,
-            point: {
-                pixelSize: 12,
-                color: Cesium.Color.fromCssColorString(etape.couleur),
-                outlineColor: Cesium.Color.WHITE,
-                outlineWidth: 2
-            },
-            label: {
-                text: etape.nom,
-                font: "14px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                outlineWidth: 2,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -18),
-                disableDepthTestDistance: Number.POSITIVE_INFINITY
-            }
-        });
+const point = viewer.entities.add({
+    position: pos,
+    point: {
+        pixelSize: 12,
+        color: Cesium.Color.fromCssColorString(etape.couleur),
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 2
+    },
+    label: {
+        text: etape.nom,
+        font: "14px sans-serif",
+        fillColor: Cesium.Color.WHITE,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        outlineWidth: 2,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        pixelOffset: new Cesium.Cartesian2(0, -18),
+        disableDepthTestDistance: Number.POSITIVE_INFINITY
+    },
+    description: `
+        <h2>${etape.nom}</h2>
+        ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
+        ${etape.lien ? `<p><a href="${etape.lien}" target="_blank">Lien externe</a></p>` : ""}
+    `
+});
+
 
         groupe.push(point);
 
