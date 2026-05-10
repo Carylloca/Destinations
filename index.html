@@ -245,14 +245,15 @@ voyages.forEach((v, index) => {
     div.className = "voyage-item";
 
     div.innerHTML = `
-        <img src="${img}" class="miniature">
-        <span class="color-dot" style="background:${couleur}"></span>
-        <label>
-            <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
-            ${v.titre}
-        </label>
-        <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
+    <img src="${img}" class="miniature">
+    <span class="color-dot" style="background:${couleur}"></span>
+    <label>
+        <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
+        ${v.titre}
+    </label>
+    <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
     `;
+
     
     listeDiv.appendChild(div);
 });
