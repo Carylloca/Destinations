@@ -293,58 +293,6 @@ viewer.camera.flyTo({
 });
 
 
-// === AFFICHAGE DES VOYAGES ===
-function arc3D(lon1, lat1, lon2, lat2, hauteur) {
-    const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
-    const p2 = Cesium.Cartesian3.fromDegrees(lon2, lat2);
-
-    const cartesians = [];
-    const steps = 64;
-
-    for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
-
-        const cart = Cesium.Cartesian3.lerp(p1, p2, t, new Cesium.Cartesian3());
-        const carto = Cesium.Cartographic.fromCartesian(cart);
-
-        carto.height = Math.sin(Math.PI * t) * hauteur;
-
-        cartesians.push(
-            Cesium.Cartesian3.fromRadians(
-                carto.longitude,
-                carto.latitude,
-                carto.height
-            )
-        );
-    }
-
-    return cartesians;
-}
-
-function toggleVoyage(index, afficher) {
-    if (afficher) afficherVoyage(index);
-    else masquerVoyage(index);
-}
-function hauteurArcDynamique(lon1, lat1, lon2, lat2) {
-    // Calcul distance approximative en degrés
-    const dLon = Math.abs(lon2 - lon1);
-    const dLat = Math.abs(lat2 - lat1);
-
-    // Distance "brute"
-    const distance = Math.sqrt(dLon * dLon + dLat * dLat);
-
-    // Conversion en hauteur (scaling)
-    let hauteur = distance * 20000000; // facteur d'échelle
-
-    // Hauteur minimale
-    if (hauteur < 150000) hauteur = 150000;
-
-    // Hauteur maximale
-    if (hauteur > 400000) hauteur = 400000;
-
-    return hauteur;
-}
-
 function afficherVoyage(index) {
     const voyage = voyages[index];
     const groupe = [];
@@ -352,125 +300,79 @@ function afficherVoyage(index) {
     let last = null;
 
     voyage.etapes.forEach((etape) => {
+
+        // --- POINT / ETAPE ---
         const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
 
-const point = viewer.entities.add({
-    position: pos,
-    point: {
-        pixelSize: 12,
-        color: Cesium.Color.fromCssColorString(etape.couleur),
-        outlineColor: Cesium.Color.WHITE,
-        outlineWidth: 2
-    },
-    label: {
-        text: etape.nom,
-        font: "14px sans-serif",
-        fillColor: Cesium.Color.WHITE,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        outlineWidth: 2,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        pixelOffset: new Cesium.Cartesian2(0, -18),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY
-    },
-    description: `
-        <h2>${etape.nom}</h2>
-        ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
-        ${etape.lien ? `<p><a href="${etape.lien}" target="_blank">Lien externe</a></p>` : ""}
-    `
-});
-
+        const point = viewer.entities.add({
+            position: pos,
+            point: {
+                pixelSize: 12,
+                color: Cesium.Color.fromCssColorString(etape.couleur),
+                outlineColor: Cesium.Color.WHITE,
+                outlineWidth: 2
+            },
+            label: {
+                text: etape.nom,
+                font: "14px sans-serif",
+                fillColor: Cesium.Color.WHITE,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -18),
+                disableDepthTestDistance: Number.POSITIVE_INFINITY
+            },
+            description: `
+                <h2>${etape.nom}</h2>
+                ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
+                ${etape.lien ? `<p><a href="${etape.lien}" target="_blank">Lien externe</a></p>` : ""}
+            `
+        });
 
         groupe.push(point);
 
-if (last) {
-    let hauteurArc = etape.hauteurArc;
+        // --- ARC ENTRE ETAPES ---
+        if (last) {
 
-    // ✈️ Avion → hauteur dynamique
-    if (etape.transport === "avion") {
-        hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
-    }
+            let hauteurArc = etape.hauteurArc;
 
-    // 🌊 Bateau → 200 m
-    if (etape.transport === "bateau") {
-        hauteurArc = 200;
-    }
+            // ✈️ Avion → hauteur dynamique
+            if (etape.transport === "avion") {
+                hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
+            }
 
-    // 🚶 Marche → 500 m
-    if (etape.transport === "marche") {
-        hauteurArc = 500;
-    }
+            // 🌊 Bateau → 200 m
+            if (etape.transport === "bateau") {
+                hauteurArc = 200;
+            }
 
-    const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
+            // 🚶 Marche → 500 m
+            if (etape.transport === "marche") {
+                hauteurArc = 500;
+            }
 
-    const ligne = viewer.entities.add({
-        polyline: {
-            positions: arc,
-            width: 3,
-            material: new Cesium.PolylineGlowMaterialProperty({
-                glowPower: 0.2,
-                color: Cesium.Color.fromCssColorString(etape.couleur)
-            })
-        }
-    });
+            const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
 
-    groupe.push(ligne);
-}
+            const ligne = viewer.entities.add({
+                polyline: {
+                    positions: arc,
+                    width: 3,
+                    material: new Cesium.PolylineGlowMaterialProperty({
+                        glowPower: 0.2,
+                        color: Cesium.Color.fromCssColorString(etape.couleur)
+                    })
+                }
+            });
 
-last = { lon: etape.lon, lat: etape.lat };
-});
-
-groupesCesium[index] = groupe;
-}
-
-
-// Si transport = avion → hauteur dynamique
-if (etape.transport === "avion") {
-    hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
-}
-
-// 🌊 Bateau → 200 m
-if (etape.transport === "bateau") {
-    hauteurArc = 200;
-}
-
-// 🚶 Marche → 500 m
-if (etape.transport === "marche") {
-    hauteurArc = 500;
-}
-
-const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
-
-const ligne = viewer.entities.add({
-    polyline: {
-        positions: arc,
-        width: 3,
-        material: new Cesium.PolylineGlowMaterialProperty({
-            glowPower: 0.2,
-            color: Cesium.Color.fromCssColorString(etape.couleur)
-        })
-    }
-});
-
-groupe.push(ligne);
-
+            groupe.push(ligne);
         }
 
+        // Mise à jour du dernier point
         last = { lon: etape.lon, lat: etape.lat };
     });
 
     groupesCesium[index] = groupe;
 }
-
-function masquerVoyage(index) {
-    if (!groupesCesium[index]) return;
-
-    groupesCesium[index].forEach(entite => {
-        viewer.entities.remove(entite);
-    });
-
-    groupesCesium[index] = [];
-}
-
 
 // === 🌍 CENTRAGE PRO (auto-zoom selon taille du voyage) ===
 function centrerVoyage(index) {
