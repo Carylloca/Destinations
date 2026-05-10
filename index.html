@@ -92,8 +92,7 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 // 🟨 ZONE DE COLLAGE DES VOYAGES 🟨
 const voyages = [
-    
-// ======= DÉBUT DU VOYAGE "Ile Maurice 2025 - 2026" =======
+    // ======= DÉBUT DU VOYAGE "Ile Maurice 2025 - 2026" =======
 
 {
     "titre": "Ile Maurice 2025 - 2026",
@@ -225,9 +224,6 @@ const voyages = [
 }
 
 // ======= FIN DU VOYAGE "Maldives 2014" =======
-
-
-
 ];
 // 🟨 FIN ZONE DE COLLAGE 🟨
 
@@ -245,16 +241,15 @@ voyages.forEach((v, index) => {
     div.className = "voyage-item";
 
     div.innerHTML = `
-    <img src="${img}" class="miniature">
-    <span class="color-dot" style="background:${couleur}"></span>
-    <label>
-        <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
-        ${v.titre}
-    </label>
-    <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
+        <img src="${img}" class="miniature">
+        <span class="color-dot" style="background:${couleur}"></span>
+        <label>
+            <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
+            ${v.titre}
+        </label>
+        <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
     `;
 
-    
     listeDiv.appendChild(div);
 });
 
@@ -278,7 +273,6 @@ function decocherTout() {
 }
 
 
-
 // === CESIUM ===
 const viewer = new Cesium.Viewer("cesiumContainer", {
     terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -295,6 +289,54 @@ viewer.camera.flyTo({
 });
 
 
+// === ARC 3D ===
+function arc3D(lon1, lat1, lon2, lat2, hauteur) {
+    const p1 = Cesium.Cartesian3.fromDegrees(lon1, lat1);
+    const p2 = Cesium.Cartesian3.fromDegrees(lon2, lat2);
+
+    const cartesians = [];
+    const steps = 64;
+
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+
+        const cart = Cesium.Cartesian3.lerp(p1, p2, t, new Cesium.Cartesian3());
+        const carto = Cesium.Cartographic.fromCartesian(cart);
+
+        carto.height = Math.sin(Math.PI * t) * hauteur;
+
+        cartesians.push(
+            Cesium.Cartesian3.fromRadians(
+                carto.longitude,
+                carto.latitude,
+                carto.height
+            )
+        );
+    }
+
+    return cartesians;
+}
+
+function hauteurArcDynamique(lon1, lat1, lon2, lat2) {
+    const dLon = Math.abs(lon2 - lon1);
+    const dLat = Math.abs(lat2 - lat1);
+    const distance = Math.sqrt(dLon * dLon + dLat * dLat);
+
+    let hauteur = distance * 20000000;
+
+    if (hauteur < 150000) hauteur = 150000;
+    if (hauteur > 400000) hauteur = 400000;
+
+    return hauteur;
+}
+
+
+// === AFFICHAGE DES VOYAGES ===
+function toggleVoyage(index, afficher) {
+    if (afficher) afficherVoyage(index);
+    else masquerVoyage(index);
+}
+
 function afficherVoyage(index) {
     const voyage = voyages[index];
     const groupe = [];
@@ -303,7 +345,6 @@ function afficherVoyage(index) {
 
     voyage.etapes.forEach((etape) => {
 
-        // --- POINT / ETAPE ---
         const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
 
         const point = viewer.entities.add({
@@ -333,25 +374,14 @@ function afficherVoyage(index) {
 
         groupe.push(point);
 
-        // --- ARC ENTRE ETAPES ---
         if (last) {
-
             let hauteurArc = etape.hauteurArc;
 
-            // ✈️ Avion → hauteur dynamique
             if (etape.transport === "avion") {
                 hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
             }
-
-            // 🌊 Bateau → 200 m
-            if (etape.transport === "bateau") {
-                hauteurArc = 200;
-            }
-
-            // 🚶 Marche → 500 m
-            if (etape.transport === "marche") {
-                hauteurArc = 500;
-            }
+            if (etape.transport === "bateau") hauteurArc = 200;
+            if (etape.transport === "marche") hauteurArc = 500;
 
             const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
 
@@ -369,14 +399,24 @@ function afficherVoyage(index) {
             groupe.push(ligne);
         }
 
-        // Mise à jour du dernier point
         last = { lon: etape.lon, lat: etape.lat };
     });
 
     groupesCesium[index] = groupe;
 }
 
-// === 🌍 CENTRAGE PRO (auto-zoom selon taille du voyage) ===
+function masquerVoyage(index) {
+    if (!groupesCesium[index]) return;
+
+    groupesCesium[index].forEach(entite => {
+        viewer.entities.remove(entite);
+    });
+
+    groupesCesium[index] = [];
+}
+
+
+// === CENTRAGE PRO ===
 function centrerVoyage(index) {
     const voyage = voyages[index];
 
@@ -393,17 +433,10 @@ function centrerVoyage(index) {
     const centerLon = (minLon + maxLon) / 2;
     const centerLat = (minLat + maxLat) / 2;
 
-    // Distance approximative du voyage
     const delta = Math.max(maxLon - minLon, maxLat - minLat);
 
-    // 🌍 Nouveau zoom PRO : stable, jamais extrême
-    // - petit voyage → 1.5M
-    // - moyen → 3M
-    // - grand → 6M
-    // - très grand → max 12M
     let hauteur = 1500000 * (1 + Math.log10(1 + delta * 50));
 
-    // Limites de sécurité
     if (hauteur < 1500000) hauteur = 1500000;
     if (hauteur > 12000000) hauteur = 12000000;
 
@@ -413,8 +446,7 @@ function centrerVoyage(index) {
 }
 
 
-
-// === ✔️ AFFICHER TOUS LES VOYAGES APRÈS INITIALISATION DU VIEWER ===
+// === AFFICHER TOUS LES VOYAGES AU CHARGEMENT ===
 document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
     cb.checked = true;
     afficherVoyage(i);
