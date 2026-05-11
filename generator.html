@@ -7,58 +7,82 @@
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: #eef2f7;
+        background: #f4f6f9;
         margin: 0;
         padding: 20px;
-    }
-    h2, h3 {
         color: #2c3e50;
     }
+
+    h2 {
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        margin-top: 0;
+    }
+
     .card {
         background: white;
         padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
     }
+
     input, select {
-        padding: 8px;
+        padding: 10px;
         margin: 6px 0;
-        width: 300px;
-        border-radius: 6px;
+        width: 320px;
+        border-radius: 8px;
         border: 1px solid #ccc;
+        font-size: 14px;
     }
+
     button {
-        padding: 10px 20px;
+        padding: 12px 22px;
         background: #3498db;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
         margin-top: 10px;
+        font-size: 14px;
     }
+
     button:hover {
         background: #2980b9;
     }
+
     .etape {
         border: 1px solid #ddd;
         padding: 15px;
-        border-radius: 10px;
-        margin-top: 10px;
+        border-radius: 12px;
+        margin-top: 12px;
         background: #fafafa;
     }
+
     textarea {
         width: 100%;
-        height: 250px;
+        height: 260px;
         margin-top: 20px;
         border-radius: 10px;
-        padding: 10px;
+        padding: 12px;
+        font-size: 14px;
     }
+
     .preview-map {
         width: 100%;
-        height: 200px;
+        height: 220px;
         border-radius: 10px;
         margin-top: 10px;
+    }
+
+    #zoneImport {
+        margin-top: 20px;
+        padding: 15px;
+        background: #eef5ff;
+        border-radius: 10px;
     }
 </style>
 
@@ -68,14 +92,16 @@
 </head>
 <body>
 
-<h2>🧭 Générateur de voyages CesiumJS</h2>
+<h2>🧭 Générateur de voyages CesiumJS — Version PRO</h2>
 
+<!-- ===================== INFOS VOYAGE ===================== -->
 <div class="card">
     <h3>Informations du voyage</h3>
     <label>Titre du voyage :</label><br>
-    <input id="titreVoyage" placeholder="Ex: Voyage en Polynésie 2025"><br>
+    <input id="titreVoyage" placeholder="Ex: Polynésie 2025"><br>
 </div>
 
+<!-- ===================== ÉTAPES ===================== -->
 <div class="card">
     <h3>Étapes du voyage</h3>
     <div id="etapes"></div>
@@ -83,26 +109,26 @@
     <button onclick="nouveauVoyage()">🆕 Nouveau voyage</button>
 </div>
 
+<!-- ===================== EXPORT / IMPORT ===================== -->
 <div class="card">
     <button onclick="genererCode()">🚀 Générer le code du voyage</button>
-    <button onclick="copierCode()">📋 Copier le code du voyage</button>
+    <button onclick="enregistrerVoyage()">💾 Enregistrer le voyage</button>
     <button onclick="ouvrirImport()">📥 Importer un voyage</button>
-    <button onclick="exporterTXT()">💾 Exporter en .txt</button>
 
     <h3>Code du voyage :</h3>
     <textarea id="output"></textarea>
 
-    <div id="zoneImport" style="display:none; margin-top:20px;">
+    <div id="zoneImport" style="display:none;">
         <h3>Importer un voyage :</h3>
-        <textarea id="importInput" placeholder="Collez ici le voyage à importer (avec ou sans commentaires DÉBUT/FIN)"></textarea>
-        <button onclick="importerVoyage()">🔄 Charger ce voyage</button>
+        <select id="listeVoyages"></select>
+        <button onclick="chargerVoyageDepuisGitHub()">🔄 Charger ce voyage</button>
     </div>
 </div>
 
 <script>
 let compteur = 0;
 
-// Couleurs automatiques selon le type de transport
+// Couleurs automatiques selon le transport
 const couleursTransport = {
     avion: "#3498db",
     bateau: "#1abc9c",
@@ -226,33 +252,46 @@ function genererCode() {
         });
     });
 
-    const code = `
-// ======= DÉBUT DU VOYAGE "${titre}" ( ATTENTION, Mettre un "," après "}" si ce n'est pas le dernier voyage) =======
+    const json = {
+        titre: titre,
+        etapes: etapes
+    };
 
-{
-    "titre": "${titre}",
-    "etapes": ${JSON.stringify(etapes, null, 4)}
-}
+    const instructions = 
+`📌 Pour enregistrer ce voyage :
+1. Cliquez sur "Enregistrer le voyage"
+2. Le fichier sera téléchargé automatiquement
+3. Renommez-le si nécessaire
+4. Déposez-le dans /voyages/ du dépôt GitHub Destinations
 
-// ======= FIN DU VOYAGE "${titre}" =======
 `;
 
-    document.getElementById("output").value = code;
+    document.getElementById("output").value = instructions + JSON.stringify(json, null, 4);
 }
 
-function copierCode() {
-    const textarea = document.getElementById("output");
-    textarea.select();
-    document.execCommand("copy");
-}
-
-function nouveauVoyage(silencieux = false) {
-    if (!silencieux) {
-        const confirmation = confirm(
-            "⚠️ Attention : toutes les informations du voyage en cours vont être perdues.\n\nVoulez-vous continuer ?"
-        );
-        if (!confirmation) return;
+function enregistrerVoyage() {
+    const titre = document.getElementById("titreVoyage").value.trim();
+    if (!titre) {
+        alert("Veuillez entrer un titre de voyage.");
+        return;
     }
+
+    const nomFichier = titre.replace(/\s+/g, "_") + ".json";
+    const contenu = document.getElementById("output").value.split("\n\n").slice(1).join("\n\n");
+
+    const blob = new Blob([contenu], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomFichier;
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function nouveauVoyage() {
+    if (!confirm("Voulez-vous vraiment créer un nouveau voyage ?")) return;
 
     document.getElementById("titreVoyage").value = "";
     document.getElementById("output").value = "";
@@ -261,18 +300,13 @@ function nouveauVoyage(silencieux = false) {
 }
 
 function supprimerEtape(btn) {
-    const etape = btn.closest(".etape");
-
-    const confirmation = confirm("Voulez-vous vraiment supprimer cette étape ?");
-    if (!confirmation) return;
-
-    etape.remove();
+    if (!confirm("Supprimer cette étape ?")) return;
+    btn.closest(".etape").remove();
 }
 
 function dupliquerEtape(btn) {
-    const etapeOriginale = btn.closest(".etape");
-
-    const clone = etapeOriginale.cloneNode(true);
+    const original = btn.closest(".etape");
+    const clone = original.cloneNode(true);
 
     compteur++;
     clone.querySelector("h4").textContent = "Étape " + compteur;
@@ -302,87 +336,56 @@ function dupliquerEtape(btn) {
 
 function ouvrirImport() {
     document.getElementById("zoneImport").style.display = "block";
+    chargerListeVoyages();
 }
 
-function importerVoyage() {
-    let texte = document.getElementById("importInput").value.trim();
+async function chargerListeVoyages() {
+    const url = "https://api.github.com/repos/carylloca/Destinations/contents/voyages";
+    const res = await fetch(url);
+    const files = await res.json();
 
-    if (!texte) {
-        alert("Veuillez coller un voyage à importer.");
-        return;
-    }
+    const select = document.getElementById("listeVoyages");
+    select.innerHTML = "";
 
-    // Supprimer les commentaires de type // ...
-    texte = texte.replace(/\/\/.*$/gm, "").trim();
+    files
+        .filter(f => f.name.endsWith(".json"))
+        .forEach(f => {
+            const opt = document.createElement("option");
+            opt.value = f.download_url;
+            opt.textContent = f.name;
+            select.appendChild(opt);
+        });
+}
 
-    let data;
-    try {
-        data = JSON.parse(texte);
-    } catch (e) {
-        alert("Le code collé n'est pas un JSON valide.");
-        return;
-    }
+async function chargerVoyageDepuisGitHub() {
+    const url = document.getElementById("listeVoyages").value;
+    const res = await fetch(url);
+    const data = await res.json();
 
-    // Réinitialiser le générateur sans avertissement
-    nouveauVoyage(true);
+    nouveauVoyage();
 
-    document.getElementById("titreVoyage").value = data.titre || "";
+    document.getElementById("titreVoyage").value = data.titre;
 
-    if (!Array.isArray(data.etapes)) {
-        alert("Le voyage importé ne contient pas de liste d'étapes valide.");
-        return;
-    }
-
-    data.etapes.forEach(etape => {
+    data.etapes.forEach(e => {
         ajouterEtape();
+        const last = document.querySelector("#etapes .etape:last-child");
 
-        const bloc = document.querySelector("#etapes .etape:last-child");
+        last.querySelector(".lieu").value = e.nom;
+        last.querySelector(".typeEtape").value = e.typeEtape;
+        last.querySelector(".transport").value = e.transport;
+        last.querySelector(".lon").value = e.lon;
+        last.querySelector(".lat").value = e.lat;
+        last.querySelector(".lien").value = e.lien;
+        last.querySelector(".photo").value = e.photo;
 
-        bloc.querySelector(".lieu").value = etape.nom || "";
-        bloc.querySelector(".typeEtape").value = etape.typeEtape || "etape";
-        bloc.querySelector(".transport").value = etape.transport || "avion";
-        bloc.querySelector(".lon").value = etape.lon ?? "";
-        bloc.querySelector(".lat").value = etape.lat ?? "";
-        bloc.querySelector(".lien").value = etape.lien || "";
-        bloc.querySelector(".photo").value = etape.photo || "";
-
-        if (etape.lat != null && etape.lon != null) {
-            bloc.map.setView([etape.lat, etape.lon], 8);
-            bloc.marker = L.marker([etape.lat, etape.lon]).addTo(bloc.map);
+        if (e.lat != null && e.lon != null) {
+            last.map.setView([e.lat, e.lon], 8);
+            last.marker = L.marker([e.lat, e.lon]).addTo(last.map);
         }
     });
 
-    alert("Voyage importé avec succès !");
+    genererCode();
 }
-
-    function exporterTXT() {
-    const titre = document.getElementById("titreVoyage").value.trim();
-    const contenu = document.getElementById("output").value;
-
-    if (!titre) {
-        alert("Veuillez entrer un titre de voyage avant d'exporter.");
-        return;
-    }
-
-    if (!contenu.trim()) {
-        alert("Veuillez générer le code du voyage avant d'exporter.");
-        return;
-    }
-
-    const nomFichier = titre.replace(/[^a-z0-9\-_\s]/gi, "_") + ".txt";
-
-    const blob = new Blob([contenu], { type: "text/plain;charset=utf-8" });
-
-    const lien = document.createElement("a");
-    lien.href = URL.createObjectURL(blob);
-    lien.download = nomFichier;
-
-    lien.click();
-
-    URL.revokeObjectURL(lien.href);
-}
-
-
 </script>
 
 </body>
