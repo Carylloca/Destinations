@@ -446,6 +446,26 @@ const voyages = [
 ];
 // 🟨 FIN ZONE DE COLLAGE 🟨
 
+    
+// === COULEURS HARMONIEUSES & STABLES PAR VOYAGE ===
+    
+function couleurStableDepuisTexte(texte) {
+    let hash = 0;
+    for (let i = 0; i < texte.length; i++) {
+        hash = texte.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    const h = Math.abs(hash) % 360; // teinte (0–360)
+    const s = 65;                   // saturation %
+    const l = 55;                   // luminosité %
+
+    return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+// Attribuer une couleur harmonieuse à chaque voyage
+voyages.forEach(v => {
+    v.couleurVoyage = couleurStableDepuisTexte(v.titre);
+});
 
 // === INTERFACE : LISTE, MINIATURES, COULEURS ===
 const groupesCesium = [];
