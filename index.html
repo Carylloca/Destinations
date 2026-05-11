@@ -116,13 +116,30 @@
 <script>
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
 
-// === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON ===
+// === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON DEPUIS GITHUB ===
 async function chargerVoyages() {
-    const fichiers = [
-        "tahiti-2025.json",
-        "maldives-2014.json"
-        // ajoute ici les autres voyages
-    ];
+    const repoUser = "carylloca";          // ton nom GitHub
+    const repoName = "Destinations";       // nom du dépôt
+    const folder = "voyages";              // dossier contenant les JSON
+
+    // 1) Récupérer la liste des fichiers du dossier via l’API GitHub
+    const apiUrl = `https://api.github.com/repos/${repoUser}/${repoName}/contents/${folder}`;
+    const response = await fetch(apiUrl);
+    const files = await response.json();
+
+    // 2) Filtrer uniquement les fichiers .json
+    const jsonFiles = files.filter(f => f.name.endsWith(".json"));
+
+    const voyages = [];
+
+    // 3) Charger chaque fichier JSON
+    for (const file of jsonFiles) {
+        const data = await fetch(file.download_url).then(r => r.json());
+        voyages.push(data);
+    }
+
+    return voyages;
+}
 
     const liste = [];
 
