@@ -138,6 +138,7 @@ let voyages = [];
 
 chargerVoyages().then(data => {
     voyages = data;
+    console.log("Voyages chargés :", voyages);
 
     voyages.forEach(v => {
         v.couleurVoyage = couleurStableDepuisTexte(v.titre);
