@@ -1,0 +1,71 @@
+{
+    "titre": "Maldives 2014",
+    "etapes": [
+    {
+        "nom": "zurich aéroport",
+        "typeEtape": "depart",
+        "transport": "avion",
+        "lon": 8.561899,
+        "lat": 47.4500629,
+        "lien": "https://mesvoyages.ch/les-maldives/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/0.-LES-MALDIVES.jpg",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Doha aéroport",
+        "typeEtape": "escale",
+        "transport": "avion",
+        "lon": 51.6124512,
+        "lat": 25.2748602,
+        "lien": "",
+        "photo": "",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Aéroport international Malé MLE",
+        "typeEtape": "escale",
+        "transport": "avion",
+        "lon": 73.5301042,
+        "lat": 4.1961894,
+        "lien": "",
+        "photo": "",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Aéroport international Villa Maamigili",
+        "typeEtape": "escale",
+        "transport": "avion",
+        "lon": 72.8328727,
+        "lat": 3.4715439,
+        "lien": "",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1.-les-maldives.jpg",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Nalaguraidhoo",
+        "typeEtape": "escale",
+        "transport": "bateau",
+        "lon": 72.80165433883668,
+        "lat": 3.4879056160162913,
+        "lien": "https://mesvoyages.ch/les-maldives/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/13.-les-maldives.jpg",
+        "couleur": "#1abc9c",
+        "hauteurArc": 20000
+    },
+    {
+        "nom": "Nalaguraidhoo",
+        "typeEtape": "arrivee",
+        "transport": "marche",
+        "lon": 72.80101060867311,
+        "lat": 3.480774423835113,
+        "lien": "https://mesvoyages.ch/les-maldives/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/7.-les-maldives.jpg",
+        "couleur": "#2ecc71",
+        "hauteurArc": 5000
+    }
+]
+}
