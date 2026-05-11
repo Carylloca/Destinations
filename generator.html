@@ -227,14 +227,14 @@ function genererCode() {
     });
 
     const code = `
-// ======= DÉBUT DU VOYAGE "${titre}" =======
+// ======= DÉBUT DU VOYAGE "${titre}" ( ATTENTION, Mettre un "," après "}" si ce n'est pas le dernier voyage) =======
 
 {
     "titre": "${titre}",
     "etapes": ${JSON.stringify(etapes, null, 4)}
 }
 
-// ======= FIN DU VOYAGE "${titre}" ( ATTENTION, Mettre un "," après "}" si ce n'est pas le dernier voyage) =======
+// ======= FIN DU VOYAGE "${titre}" =======
 `;
 
     document.getElementById("output").value = code;
