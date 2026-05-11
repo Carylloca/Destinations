@@ -591,7 +591,7 @@ function afficherVoyage(index) {
             position: pos,
             point: {
                 pixelSize: 12,
-                color: Cesium.Color.fromCssColorString(etape.couleur),
+                color: Cesium.Color.fromCssColorString(voyage.couleurVoyage),
                 outlineColor: Cesium.Color.WHITE,
                 outlineWidth: 2
             },
@@ -626,15 +626,17 @@ function afficherVoyage(index) {
             const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
 
             const ligne = viewer.entities.add({
-                polyline: {
-                    positions: arc,
-                    width: 3,
-                    material: new Cesium.PolylineGlowMaterialProperty({
-                        glowPower: 0.2,
-                        color: Cesium.Color.fromCssColorString(etape.couleur)
-                    })
-                }
-            });
+    polyline: {
+        positions: arc,
+        width: 5, // épaisseur augmentée
+        material: new Cesium.PolylineGlowMaterialProperty({
+            glowPower: 0.2,
+            color: Cesium.Color.fromCssColorString(voyage.couleurVoyage) // couleur du voyage
+        }),
+        clampToGround: false
+    }
+});
+
 
             groupe.push(ligne);
         }
