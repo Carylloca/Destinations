@@ -87,6 +87,7 @@
     <button onclick="genererCode()">🚀 Générer le code du voyage</button>
     <button onclick="copierCode()">📋 Copier le code du voyage</button>
     <button onclick="ouvrirImport()">📥 Importer un voyage</button>
+    <button onclick="exporterTXT()">💾 Exporter en .txt</button>
 
     <h3>Code du voyage :</h3>
     <textarea id="output"></textarea>
@@ -233,7 +234,7 @@ function genererCode() {
     "etapes": ${JSON.stringify(etapes, null, 4)}
 }
 
-// ======= FIN DU VOYAGE "${titre}" =======
+// ======= FIN DU VOYAGE "${titre}" ( ATTENTION, Mettre un "," après "}" si ce n'est pas le dernier voyage) =======
 `;
 
     document.getElementById("output").value = code;
@@ -353,6 +354,35 @@ function importerVoyage() {
 
     alert("Voyage importé avec succès !");
 }
+
+    function exporterTXT() {
+    const titre = document.getElementById("titreVoyage").value.trim();
+    const contenu = document.getElementById("output").value;
+
+    if (!titre) {
+        alert("Veuillez entrer un titre de voyage avant d'exporter.");
+        return;
+    }
+
+    if (!contenu.trim()) {
+        alert("Veuillez générer le code du voyage avant d'exporter.");
+        return;
+    }
+
+    const nomFichier = titre.replace(/[^a-z0-9\-_\s]/gi, "_") + ".txt";
+
+    const blob = new Blob([contenu], { type: "text/plain;charset=utf-8" });
+
+    const lien = document.createElement("a");
+    lien.href = URL.createObjectURL(blob);
+    lien.download = nomFichier;
+
+    lien.click();
+
+    URL.revokeObjectURL(lien.href);
+}
+
+
 </script>
 
 </body>
