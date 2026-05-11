@@ -83,14 +83,6 @@
         overflow: visible !important;
         max-height: none !important;
     }
-
-    .cesium-infoBox-description img {
-        max-width: 300px !important;
-        width: 100% !important;
-        height: auto !important;
-        display: block !important;
-        margin: 0 auto !important;
-    }
 </style>
 
 </head>
@@ -110,7 +102,7 @@
 </div>
 
 <script>
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
+Cesium.Ion.defaultAccessToken = "TON_TOKEN_CESIUM_ICI";
 
 // === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON DEPUIS GITHUB ===
 async function chargerVoyages() {
@@ -135,9 +127,12 @@ async function chargerVoyages() {
 }
 
 let voyages = [];
+let groupesCesium = [];
 
+// === LANCEMENT ===
 chargerVoyages().then(data => {
     voyages = data;
+
     console.log("Voyages chargés :", voyages);
 
     voyages.forEach(v => {
@@ -145,38 +140,35 @@ chargerVoyages().then(data => {
     });
 
     initialiserInterface();
+    afficherTousLesVoyages();
 });
 
-// === COULEURS HARMONIEUSES & STABLES PAR VOYAGE ===
+// === COULEURS HARMONIEUSES ===
 function couleurStableDepuisTexte(texte) {
     let hash = 0;
     for (let i = 0; i < texte.length; i++) {
         hash = texte.charCodeAt(i) + ((hash << 5) - hash);
     }
-
     const h = Math.abs(hash) % 360;
     return `hsl(${h}, 65%, 55%)`;
 }
 
 // === INTERFACE ===
-let groupesCesium = [];
-
 function initialiserInterface() {
     const listeDiv = document.getElementById("voyagesList");
 
     voyages.forEach((v, index) => {
         let miniature = v.etapes.find(e => e.photo && e.photo.trim() !== "");
         let img = miniature ? miniature.photo : "https://placehold.co/32x32?text=📍";
-        let couleur = v.couleurVoyage;
 
         const div = document.createElement("div");
         div.className = "voyage-item";
 
         div.innerHTML = `
             <img src="${img}" class="miniature">
-            <span class="color-dot" style="background:${couleur}"></span>
+            <span class="color-dot" style="background:${v.couleurVoyage}"></span>
             <label>
-                <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
+                <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)" checked>
                 ${v.titre}
             </label>
             <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
@@ -220,10 +212,86 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
 });
-</script>
 
-</body>
-</html>
+// === AFFICHAGE DES VOYAGES ===
+function afficherTousLesVoyages() {
+    voyages.forEach((_, i) => afficherVoyage(i));
+}
+
+function toggleVoyage(index, afficher) {
+    if (afficher) afficherVoyage(index);
+    else masquerVoyage(index);
+}
+
+function afficherVoyage(index) {
+    const voyage = voyages[index];
+    const groupe = [];
+
+    let last = null;
+
+    voyage.etapes.forEach((etape) => {
+        const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
+
+        const point = viewer.entities.add({
+            position: pos,
+            point: {
+                pixelSize: 12,
+                color: Cesium.Color.fromCssColorString(voyage.couleurVoyage),
+                outlineColor: Cesium.Color.WHITE,
+                outlineWidth: 2
+            },
+            label: {
+                text: etape.nom,
+                font: "14px sans-serif",
+                fillColor: Cesium.Color.WHITE,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -18)
+            },
+            description: `
+                <h2>${etape.nom}</h2>
+                ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
+                ${etape.lien ? `<p><a href="${etape.lien}" target="_blank">Lien externe</a></p>` : ""}
+            `
+        });
+
+        groupe.push(point);
+
+        if (last) {
+            const hauteurArc = etape.hauteurArc || 300000;
+
+            const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
+
+            const ligne = viewer.entities.add({
+                polyline: {
+                    positions: arc,
+                    width: 5,
+                    material: new Cesium.PolylineGlowMaterialProperty({
+                        glowPower: 0.2,
+                        color: Cesium.Color.fromCssColorString(voyage.couleurVoyage)
+                    })
+                }
+            });
+
+            groupe.push(ligne);
+        }
+
+        last = { lon: etape.lon, lat: etape.lat };
+    });
+
+    groupesCesium[index] = groupe;
+}
+
+function masquerVoyage(index) {
+    if (!groupesCesium[index]) return;
+
+    groupesCesium[index].forEach(entite => {
+        viewer.entities.remove(entite);
+    });
+
+    groupesCesium[index] = [];
+}
 
 // === ARC 3D ===
 function arc3D(lon1, lat1, lon2, lat2, hauteur) {
@@ -253,108 +321,6 @@ function arc3D(lon1, lat1, lon2, lat2, hauteur) {
     return cartesians;
 }
 
-function hauteurArcDynamique(lon1, lat1, lon2, lat2) {
-    const dLon = Math.abs(lon2 - lon1);
-    const dLat = Math.abs(lat2 - lat1);
-    const distance = Math.sqrt(dLon * dLon + dLat * dLat);
-
-    let hauteur = distance * 20000000;
-
-    if (hauteur < 150000) hauteur = 150000;
-    if (hauteur > 400000) hauteur = 400000;
-
-    return hauteur;
-}
-
-
-// === AFFICHAGE DES VOYAGES ===
-function toggleVoyage(index, afficher) {
-    if (afficher) afficherVoyage(index);
-    else masquerVoyage(index);
-}
-
-function afficherVoyage(index) {
-    const voyage = voyages[index];
-    const groupe = [];
-
-    let last = null;
-
-    voyage.etapes.forEach((etape) => {
-
-        const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
-
-        const point = viewer.entities.add({
-            position: pos,
-            point: {
-                pixelSize: 12,
-                color: Cesium.Color.fromCssColorString(voyage.couleurVoyage),
-                outlineColor: Cesium.Color.WHITE,
-                outlineWidth: 2
-            },
-            label: {
-                text: etape.nom,
-                font: "14px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                outlineWidth: 2,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -18),
-                disableDepthTestDistance: 0
-            },
-            description: `
-                <h2>${etape.nom}</h2>
-                ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
-                ${etape.lien ? `<p><a href="${etape.lien}" target="_blank">Lien externe</a></p>` : ""}
-            `
-        });
-
-        groupe.push(point);
-
-        if (last) {
-            let hauteurArc = etape.hauteurArc;
-
-            if (etape.transport === "avion") {
-                hauteurArc = hauteurArcDynamique(last.lon, last.lat, etape.lon, etape.lat);
-            }
-            if (etape.transport === "bateau") hauteurArc = 200;
-            if (etape.transport === "marche") hauteurArc = 500;
-
-            const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
-
-            const ligne = viewer.entities.add({
-    polyline: {
-        positions: arc,
-        width: 5, // épaisseur augmentée
-        material: new Cesium.PolylineGlowMaterialProperty({
-            glowPower: 0.2,
-            color: Cesium.Color.fromCssColorString(voyage.couleurVoyage) // couleur du voyage
-        }),
-        clampToGround: false
-    }
-});
-
-
-            groupe.push(ligne);
-        }
-
-        last = { lon: etape.lon, lat: etape.lat };
-    });
-
-    groupesCesium[index] = groupe;
-}
-
-function masquerVoyage(index) {
-    if (!groupesCesium[index]) return;
-
-    groupesCesium[index].forEach(entite => {
-        viewer.entities.remove(entite);
-    });
-
-    groupesCesium[index] = [];
-}
-
-
-// === CENTRAGE PRO ===
 function centrerVoyage(index) {
     const voyage = voyages[index];
 
@@ -371,24 +337,10 @@ function centrerVoyage(index) {
     const centerLon = (minLon + maxLon) / 2;
     const centerLat = (minLat + maxLat) / 2;
 
-    const delta = Math.max(maxLon - minLon, maxLat - minLat);
-
-    let hauteur = 1500000 * (1 + Math.log10(1 + delta * 50));
-
-    if (hauteur < 1500000) hauteur = 1500000;
-    if (hauteur > 12000000) hauteur = 12000000;
-
     viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, hauteur)
+        destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, 2000000)
     });
 }
-
-
-// === AFFICHER TOUS LES VOYAGES AU CHARGEMENT ===
-document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
-    cb.checked = true;
-    afficherVoyage(i);
-});
 </script>
 
 </body>
