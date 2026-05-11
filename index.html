@@ -241,14 +241,16 @@ function afficherVoyage(index) {
                 outlineWidth: 2
             },
             label: {
-                text: etape.nom,
-                font: "14px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                outlineWidth: 2,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -18)
-            },
+    text: etape.nom,
+    font: "14px sans-serif",
+    fillColor: Cesium.Color.WHITE,
+    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+    outlineWidth: 2,
+    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+    pixelOffset: new Cesium.Cartesian2(0, -18),
+    disableDepthTestDistance: 0   // 👈 EMPÊCHE l'affichage derrière le globe
+}
+
             description: `
                 <h2>${etape.nom}</h2>
                 ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
