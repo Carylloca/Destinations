@@ -80,6 +80,21 @@
         margin: 0 auto;
     }
 
+    /* Empêche Cesium de couper le contenu du popup */
+    .cesium-infoBox-description {
+        overflow: visible !important;
+        max-height: none !important;
+    }
+
+    /* Affiche correctement les images dans le popup */
+    .cesium-infoBox-description img {
+        max-width: 300px !important;
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        margin: 0 auto !important;
+    }
+
 </style>
 
 </head>
