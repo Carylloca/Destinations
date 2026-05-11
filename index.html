@@ -116,365 +116,40 @@
 <script>
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
 
-// 🟨 ZONE DE COLLAGE DES VOYAGES 🟨
-const voyages = [
-    // ======= DÉBUT DU VOYAGE "Ile Maurice 2025 - 2026" =======
+// === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON ===
+async function chargerVoyages() {
+    const fichiers = [
+        "tahiti-2025.json",
+        "maldives-2014.json"
+        // ajoute ici les autres voyages
+    ];
 
-{
-    "titre": "Ile Maurice 2025 - 2026",
-    "etapes": [
-    {
-        "nom": "Genève aéroport",
-        "typeEtape": "depart",
-        "transport": "avion",
-        "lon": 6.1102707,
-        "lat": 46.2313343,
-        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-sud/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1002.webp",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Aéroport Ile Maurice",
-        "typeEtape": "etape",
-        "transport": "voiture",
-        "lon": 57.68148422241212,
-        "lat": -20.434035499044324,
-        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-sud/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1003.webp",
-        "couleur": "#f1c40f",
-        "hauteurArc": 10000
-    },
-    {
-        "nom": "OUTRIGGER Mauritius Beach Resort",
-        "typeEtape": "etape",
-        "transport": "voiture",
-        "lon": 57.4174577,
-        "lat": -20.5107092,
-        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-sud/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1001-scaled.webp",
-        "couleur": "#f1c40f",
-        "hauteurArc": 10000
-    },
-    {
-        "nom": "Hôtel: Canonnier Beachcomber",
-        "typeEtape": "etape",
-        "transport": "voiture",
-        "lon": 57.55462646484376,
-        "lat": -20.002240446031553,
-        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-ouest/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1200.webp",
-        "couleur": "#f1c40f",
-        "hauteurArc": 10000
+    const liste = [];
+
+    for (const f of fichiers) {
+        const data = await fetch("voyages/" + f).then(r => r.json());
+        liste.push(data);
     }
-]
-},
 
-// ======= FIN DU VOYAGE "Ile Maurice 2025 - 2026" =======
-
-    
-// ======= DÉBUT DU VOYAGE "Ile Maurice 2024" ( ATTENTION, Mettre un "," après "}" si ce n'est pas le dernier voyage) =======
-
-{
-    "titre": "Ile Maurice 2024",
-    "etapes": [
-    {
-        "nom": "Genève aéroport GVA",
-        "typeEtape": "depart",
-        "transport": "avion",
-        "lon": 6.1081212,
-        "lat": 46.2378164,
-        "lien": "",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1108_maurice_2023-2024-400x284.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Mauritus aéroport MRU",
-        "typeEtape": "etape",
-        "transport": "voiture",
-        "lon": 57.6849489,
-        "lat": -20.4325615,
-        "lien": "",
-        "photo": "",
-        "couleur": "#f1c40f",
-        "hauteurArc": 10000
-    },
-    {
-        "nom": "Hôtel La pirogue Mauritus",
-        "typeEtape": "etape",
-        "transport": "voiture",
-        "lon": 57.3645201,
-        "lat": -20.2986813,
-        "lien": "https://mesvoyages.ch/ile-maurice-ouest/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/titre-pirogue.jpg",
-        "couleur": "#f1c40f",
-        "hauteurArc": 10000
-    },
-    {
-        "nom": "Hôlet Tekoma Rodrigues Mauritus",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": 63.496556282043464,
-        "lat": -19.69641562298926,
-        "lien": "https://mesvoyages.ch/rodrigues/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/titre-tekoma.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Seasense Boutique Hotel & Spa Mauritus",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": 57.793858051300056,
-        "lat": -20.21556409276376,
-        "lien": "https://mesvoyages.ch/ile-maurice-est/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/titre-seasens.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    }
-]
-},
-
-// ======= FIN DU VOYAGE "Ile Maurice 2024" =======
-
- 
-// ======= DÉBUT DU VOYAGE "Polynésie 2025"  ( ATTENTION, Mettre un "," après "}" si ce n'est pas le dernier voyage)=======
-
-{
-    "titre": "Polynésie 2025",
-    "etapes": [
-    {
-        "nom": "Genève aéroport",
-        "typeEtape": "depart",
-        "transport": "avion",
-        "lon": 6.1102707,
-        "lat": 46.2313343,
-        "lien": "",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/00_Moorea.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Paris aéroport CDG",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": 2.571082,
-        "lat": 49.0068908,
-        "lien": "",
-        "photo": "",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Californie Los Angeles aéroport",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": -118.4213591,
-        "lat": 33.9421675,
-        "lien": "",
-        "photo": "",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "tahiti papeete ",
-        "typeEtape": "escale",
-        "transport": "bateau",
-        "lon": -149.5561643,
-        "lat": -17.5366507,
-        "lien": "",
-        "photo": "",
-        "couleur": "#1abc9c",
-        "hauteurArc": 20000
-    },
-    {
-        "nom": "Moorea",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": -149.8386006,
-        "lat": -17.533306,
-        "lien": "",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/1014_polynesie_2025.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Hôtel Sofitel Moorea",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -149.7642353,
-        "lat": -17.5000773,
-        "lien": "https://mesvoyages.ch/moorea-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/1023_polynesie_2025.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Raiatea ",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -151.4483907,
-        "lat": -16.8193984,
-        "lien": "https://mesvoyages.ch/raiatea-tahaa-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/1149_polynesie_2025.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Huahine",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -151.0134697,
-        "lat": -16.7285884,
-        "lien": "https://mesvoyages.ch/huahine-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/1517_polynesie_2025.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Bora Bora",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -151.7366886,
-        "lat": -16.5043467,
-        "lien": "https://mesvoyages.ch/bora-bora-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/1533_polynesie_2025-400x284.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Tikehau",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -148.2270645,
-        "lat": -15.0051137,
-        "lien": "https://mesvoyages.ch/tikehau-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/2126_polynesie_2025-400x284.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Rangiroa",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -147.546209,
-        "lat": -15.1224461,
-        "lien": "https://mesvoyages.ch/rangiroa-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/2202_polynesie_2025-400x284.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Fakarava",
-        "typeEtape": "etape",
-        "transport": "avion",
-        "lon": -145.6185919,
-        "lat": -16.0563818,
-        "lien": "https://mesvoyages.ch/fakarava-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/2605_polynesie_2025-400x284.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Tahiti Papeete",
-        "typeEtape": "depart",
-        "transport": "avion",
-        "lon": -149.50487136840823,
-        "lat": -17.515273426239645,
-        "lien": "https://mesvoyages.ch/tahiti-2025/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2025/06/3018_polynesie_2025-400x284.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    }
-]
-},
-
-// ======= FIN DU VOYAGE "Polynésie 2025" =======
-
-
-
-// ======= DÉBUT DU VOYAGE "Maldives 2014" =======
-
-{
-    "titre": "Maldives 2014",
-    "etapes": [
-    {
-        "nom": "zurich aéroport",
-        "typeEtape": "depart",
-        "transport": "avion",
-        "lon": 8.561899,
-        "lat": 47.4500629,
-        "lien": "https://mesvoyages.ch/les-maldives/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/0.-LES-MALDIVES.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Doha aéroport",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": 51.6124512,
-        "lat": 25.2748602,
-        "lien": "",
-        "photo": "",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Aéroport international Malé MLE",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": 73.5301042,
-        "lat": 4.1961894,
-        "lien": "",
-        "photo": "",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Aéroport international Villa Maamigili",
-        "typeEtape": "escale",
-        "transport": "avion",
-        "lon": 72.8328727,
-        "lat": 3.4715439,
-        "lien": "",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1.-les-maldives.jpg",
-        "couleur": "#3498db",
-        "hauteurArc": 400000
-    },
-    {
-        "nom": "Nalaguraidhoo",
-        "typeEtape": "escale",
-        "transport": "bateau",
-        "lon": 72.80165433883668,
-        "lat": 3.4879056160162913,
-        "lien": "https://mesvoyages.ch/les-maldives/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/13.-les-maldives.jpg",
-        "couleur": "#1abc9c",
-        "hauteurArc": 20000
-    },
-    {
-        "nom": "Nalaguraidhoo",
-        "typeEtape": "arrivee",
-        "transport": "marche",
-        "lon": 72.80101060867311,
-        "lat": 3.480774423835113,
-        "lien": "https://mesvoyages.ch/les-maldives/",
-        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/7.-les-maldives.jpg",
-        "couleur": "#2ecc71",
-        "hauteurArc": 5000
-    }
-]
+    return liste;
 }
 
-// ======= FIN DU VOYAGE "Maldives 2014" =======
-];
-// 🟨 FIN ZONE DE COLLAGE 🟨
+let voyages = [];
 
-    
+chargerVoyages().then(data => {
+    voyages = data;
+
+    // Attribuer une couleur harmonieuse à chaque voyage
+    voyages.forEach(v => {
+        v.couleurVoyage = couleurStableDepuisTexte(v.titre);
+    });
+
+    // Construire l’interface
+    initialiserInterface();
+});
+
+
 // === COULEURS HARMONIEUSES & STABLES PAR VOYAGE ===
-    
 function couleurStableDepuisTexte(texte) {
     let hash = 0;
     for (let i = 0; i < texte.length; i++) {
@@ -488,35 +163,34 @@ function couleurStableDepuisTexte(texte) {
     return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
-// Attribuer une couleur harmonieuse à chaque voyage
-voyages.forEach(v => {
-    v.couleurVoyage = couleurStableDepuisTexte(v.titre);
-});
 
 // === INTERFACE : LISTE, MINIATURES, COULEURS ===
-const groupesCesium = [];
-const listeDiv = document.getElementById("voyagesList");
+    
+function initialiserInterface() {
+    const listeDiv = document.getElementById("voyagesList");
 
-voyages.forEach((v, index) => {
-    let miniature = v.etapes.find(e => e.photo && e.photo.trim() !== "");
-    let img = miniature ? miniature.photo : "https://placehold.co/32x32?text=📍";
-    let couleur = v.couleurVoyage || "#3498db";
+    voyages.forEach((v, index) => {
+        let miniature = v.etapes.find(e => e.photo && e.photo.trim() !== "");
+        let img = miniature ? miniature.photo : "https://placehold.co/32x32?text=📍";
+        let couleur = v.couleurVoyage || "#3498db";
 
-    const div = document.createElement("div");
-    div.className = "voyage-item";
+        const div = document.createElement("div");
+        div.className = "voyage-item";
 
-    div.innerHTML = `
-        <img src="${img}" class="miniature">
-        <span class="color-dot" style="background:${couleur}"></span>
-        <label>
-            <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
-            ${v.titre}
-        </label>
-        <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
-    `;
+        div.innerHTML = `
+            <img src="${img}" class="miniature">
+            <span class="color-dot" style="background:${couleur}"></span>
+            <label>
+                <input type="checkbox" onchange="toggleVoyage(${index}, this.checked)">
+                ${v.titre}
+            </label>
+            <span class="center-btn" onclick="centrerVoyage(${index})">📍</span>
+        `;
 
-    listeDiv.appendChild(div);
-});
+        listeDiv.appendChild(div);
+    });
+}
+
 
 function toggleMenu() {
     const div = document.getElementById("voyagesList");
