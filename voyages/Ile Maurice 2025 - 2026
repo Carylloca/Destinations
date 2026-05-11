@@ -1,0 +1,49 @@
+{
+    "titre": "Ile Maurice 2025 - 2026",
+    "etapes": [
+    {
+        "nom": "Genève aéroport",
+        "typeEtape": "depart",
+        "transport": "avion",
+        "lon": 6.1102707,
+        "lat": 46.2313343,
+        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-sud/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1002.webp",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Aéroport Ile Maurice",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.68148422241212,
+        "lat": -20.434035499044324,
+        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-sud/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1003.webp",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    },
+    {
+        "nom": "OUTRIGGER Mauritius Beach Resort",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.4174577,
+        "lat": -20.5107092,
+        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-sud/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1001-scaled.webp",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    },
+    {
+        "nom": "Hôtel: Canonnier Beachcomber",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.55462646484376,
+        "lat": -20.002240446031553,
+        "lien": "https://mesvoyages.ch/ile-maurice-2025-2026-ouest/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2026/02/Maurice_2025-2026_1200.webp",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    }
+]
+}
