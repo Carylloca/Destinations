@@ -1,0 +1,60 @@
+{
+    "titre": "Ile Maurice 2024",
+    "etapes": [
+    {
+        "nom": "Genève aéroport GVA",
+        "typeEtape": "depart",
+        "transport": "avion",
+        "lon": 6.1081212,
+        "lat": 46.2378164,
+        "lien": "",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1108_maurice_2023-2024-400x284.jpg",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Mauritus aéroport MRU",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.6849489,
+        "lat": -20.4325615,
+        "lien": "",
+        "photo": "",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    },
+    {
+        "nom": "Hôtel La pirogue Mauritus",
+        "typeEtape": "etape",
+        "transport": "voiture",
+        "lon": 57.3645201,
+        "lat": -20.2986813,
+        "lien": "https://mesvoyages.ch/ile-maurice-ouest/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/titre-pirogue.jpg",
+        "couleur": "#f1c40f",
+        "hauteurArc": 10000
+    },
+    {
+        "nom": "Hôlet Tekoma Rodrigues Mauritus",
+        "typeEtape": "escale",
+        "transport": "avion",
+        "lon": 63.496556282043464,
+        "lat": -19.69641562298926,
+        "lien": "https://mesvoyages.ch/rodrigues/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/titre-tekoma.jpg",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    },
+    {
+        "nom": "Seasense Boutique Hotel & Spa Mauritus",
+        "typeEtape": "etape",
+        "transport": "avion",
+        "lon": 57.793858051300056,
+        "lat": -20.21556409276376,
+        "lien": "https://mesvoyages.ch/ile-maurice-est/",
+        "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/titre-seasens.jpg",
+        "couleur": "#3498db",
+        "hauteurArc": 400000
+    }
+]
+}
