@@ -141,16 +141,6 @@ async function chargerVoyages() {
     return voyages;
 }
 
-    const liste = [];
-
-    for (const f of fichiers) {
-        const data = await fetch("voyages/" + f).then(r => r.json());
-        liste.push(data);
-    }
-
-    return liste;
-}
-
 let voyages = [];
 
 chargerVoyages().then(data => {
@@ -164,7 +154,6 @@ chargerVoyages().then(data => {
     // Construire l’interface
     initialiserInterface();
 });
-
 
 // === COULEURS HARMONIEUSES & STABLES PAR VOYAGE ===
 function couleurStableDepuisTexte(texte) {
