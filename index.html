@@ -8,69 +8,80 @@
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
 
-    <style>
-        html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
+<style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
 
-        #cesiumContainer {
-            position: absolute;
-            inset: 0;
-        }
+    #cesiumContainer {
+        position: absolute;
+        inset: 0;
+    }
 
-        #menuVoyages {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(255,255,255,0.90);
-            padding: 10px 14px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-family: Arial, sans-serif;
-            max-width: 260px;
-            max-height: 260px;
-            overflow-y: auto;
-            z-index: 9999;
-        }
+    #menuVoyages {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: rgba(255,255,255,0.90);
+        padding: 10px 14px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        font-family: Arial, sans-serif;
+        max-width: 260px;
+        max-height: 260px;
+        overflow-y: auto;
+        z-index: 9999;
+    }
 
-        #voyagesList {
-            margin-top: 8px;
-        }
+    #voyagesList {
+        margin-top: 8px;
+    }
 
-        .voyage-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6px;
-            gap: 6px;
-            font-size: 13px;
-        }
+    .voyage-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 6px;
+        gap: 6px;
+        font-size: 13px;
+    }
 
-        .miniature {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            object-fit: cover;
-            border: 1px solid #ccc;
-        }
+    .miniature {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+    }
 
-        .color-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid #333;
-            display: inline-block;
-        }
+    .color-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1px solid #333;
+        display: inline-block;
+    }
 
-        .center-btn {
-            cursor: pointer;
-            font-size: 16px;
-            margin-left: auto;
-        }
-    </style>
+    .center-btn {
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: auto;
+    }
+
+    /* === Correction popup Cesium : images réduites mais entièrement visibles === */
+    .cesium-infoBox-description img {
+        max-width: 300px;
+        width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+</style>
+
 </head>
 <body>
 
