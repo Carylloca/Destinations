@@ -1,0 +1,93 @@
+{
+    "titre": "Bali 2016",
+    "etapes": [
+        {
+            "nom": "Zurich aéroport",
+            "typeEtape": "depart",
+            "transport": "avion",
+            "lon": 8.561954,
+            "lat": 47.4499535,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1155-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Dubaï aéroport",
+            "typeEtape": "escale",
+            "transport": "avion",
+            "lon": 55.3666519,
+            "lat": 25.2515424,
+            "lien": "",
+            "photo": "",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Mengwi Bali",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": 115.1853933,
+            "lat": -8.5488115,
+            "lien": "https://mesvoyages.ch/mengwi/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1045-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Pemuteran Bali",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 114.6421208,
+            "lat": -8.1733784,
+            "lien": "https://mesvoyages.ch/pemuteran/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1460-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Ubud Bali",
+            "typeEtape": "escale",
+            "transport": "voiture",
+            "lon": 115.26207447052003,
+            "lat": -8.518606496329872,
+            "lien": "https://mesvoyages.ch/ubud/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1618-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Karangasem Bali",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 115.5472993,
+            "lat": -8.3587533,
+            "lien": "https://mesvoyages.ch/karangasem/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1726-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Gili Trawangan",
+            "typeEtape": "etape",
+            "transport": "bateau",
+            "lon": 116.03284478187562,
+            "lat": -8.340520181102818,
+            "lien": "https://mesvoyages.ch/ile-gili/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1906-400x284.jpg",
+            "couleur": "#1abc9c",
+            "hauteurArc": 20000
+        },
+        {
+            "nom": "Sanur Bali",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 115.2605838,
+            "lat": -8.6946473,
+            "lien": "https://mesvoyages.ch/sanur/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1918_sanur.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        }
+    ]
+}
