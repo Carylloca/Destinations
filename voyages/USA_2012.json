@@ -1,0 +1,104 @@
+{
+    "titre": "USA 2012",
+    "etapes": [
+        {
+            "nom": "Genève aéroport",
+            "typeEtape": "depart",
+            "transport": "avion",
+            "lon": 6.1102707,
+            "lat": 46.2313343,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/0.-LOS-ANGELES-scaled.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Los Angeles",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -118.242766,
+            "lat": 34.0536909,
+            "lien": "https://mesvoyages.ch/los-angeles/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/7.-Santa-Monica-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Williams Californie",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -122.1498204,
+            "lat": 39.1546844,
+            "lien": "https://mesvoyages.ch/williams/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/13.-williams-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Mexican Hat",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -109.8662095,
+            "lat": 37.1723135,
+            "lien": "https://mesvoyages.ch/mexican-hat/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/0.-MEXICAN-HAT-scaled.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Tropic usa",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -112.082135,
+            "lat": 37.6252615,
+            "lien": "https://mesvoyages.ch/tropic/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/6.-bryce-canyon-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Page Lake powell USA",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -111.4767098,
+            "lat": 36.9064882,
+            "lien": "https://mesvoyages.ch/page/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/11.-antelope-caynon-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Las Vegas Hotel Flamingo",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -115.1723637,
+            "lat": 36.1164253,
+            "lien": "https://mesvoyages.ch/las-vegas/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/0.-LAS-VEGAS-scaled.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Death Valley Visalia USA",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -116.913718,
+            "lat": 36.4228722,
+            "lien": "https://mesvoyages.ch/death-valley-visalia/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/18.-visalia-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "San Francisco USA",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -122.4104493,
+            "lat": 37.8097487,
+            "lien": "https://mesvoyages.ch/san-francisco/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/34.-alcatraz-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        }
+    ]
+}
