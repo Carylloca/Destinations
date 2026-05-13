@@ -1,0 +1,71 @@
+{
+    "titre": "Sri Lanka 2019",
+    "etapes": [
+        {
+            "nom": "Genève aéroport",
+            "typeEtape": "depart",
+            "transport": "avion",
+            "lon": 6.1102707,
+            "lat": 46.2313343,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1035-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Doha aéroport",
+            "typeEtape": "escale",
+            "transport": "avion",
+            "lon": 51.6124512,
+            "lat": 25.2748602,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1003-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Colombo Sri Lanka hôtel Mandarina",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 79.85366410610347,
+            "lat": 6.899892601049375,
+            "lien": "https://mesvoyages.ch/colombo/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1026-1-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Kandy Sry Lanka",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": 80.6350358,
+            "lat": 7.2931208,
+            "lien": "https://mesvoyages.ch/kandy/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1083-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Sigiriya Sri Lanka",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 80.7599301,
+            "lat": 7.9566634,
+            "lien": "https://mesvoyages.ch/sigiriya/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1173-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Unawatuna Sri Lanka",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 80.2474836,
+            "lat": 6.0201774,
+            "lien": "https://mesvoyages.ch/unawatuna/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1307-scaled.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        }
+    ]
+}
