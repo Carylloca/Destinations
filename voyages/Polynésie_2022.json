@@ -1,0 +1,115 @@
+{
+    "titre": "Polynésie 2022",
+    "etapes": [
+        {
+            "nom": "Genève aéroport",
+            "typeEtape": "depart",
+            "transport": "avion",
+            "lon": 6.1102707,
+            "lat": 46.2313343,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1122_Moorea_p-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Paris aéroport CDG ",
+            "typeEtape": "escale",
+            "transport": "avion",
+            "lon": 2.571082,
+            "lat": 49.0068908,
+            "lien": "",
+            "photo": "",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Los Angeles aéroport LAX",
+            "typeEtape": "escale",
+            "transport": "avion",
+            "lon": -118.4213591,
+            "lat": 33.9421675,
+            "lien": "",
+            "photo": "",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Tahiti aéroport",
+            "typeEtape": "etape",
+            "transport": "bateau",
+            "lon": -149.6105901,
+            "lat": -17.5541905,
+            "lien": "",
+            "photo": "",
+            "couleur": "#1abc9c",
+            "hauteurArc": 20000
+        },
+        {
+            "nom": "Moorea Sofitel",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": -149.7642353,
+            "lat": -17.5000773,
+            "lien": "https://mesvoyages.ch/moorea/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1146_Moorea-400x284.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Huahine Hôtel: Maitai Lapita Village",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": -151.0377917,
+            "lat": -16.7099411,
+            "lien": "https://mesvoyages.ch/huahine/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/1194_Huahine-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": " Raiatea Tahaa Opoa Beach",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": -151.36653900146487,
+            "lat": -16.83736400681573,
+            "lien": "https://mesvoyages.ch/wp-content/uploads/2024/01/0_raiatea.jpg",
+            "photo": "https://mesvoyages.ch/raiatea-thaa/",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Bora Bora Hôtel: Intercontinental Moana",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": -151.7361203,
+            "lat": -16.5419077,
+            "lien": "https://mesvoyages.ch/bora-bora/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/0_Bora.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": " Rangiroa ia Ora",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": -147.6925349235535,
+            "lat": -14.943819631954408,
+            "lien": "https://mesvoyages.ch/rangiroa/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/2184_Rangiroa-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Tahiti Hôtel Intercontinental",
+            "typeEtape": "etape",
+            "transport": "avion",
+            "lon": -149.6188969,
+            "lat": -17.5711322,
+            "lien": "https://mesvoyages.ch/tahiti/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/2338_Tahiti-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        }
+    ]
+}
