@@ -1,0 +1,49 @@
+{
+    "titre": "Fujaïra – Dubaï 2021",
+    "etapes": [
+        {
+            "nom": "Zurich aéroport",
+            "typeEtape": "depart",
+            "transport": "avion",
+            "lon": 8.561954,
+            "lat": 47.4499535,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/IMG_3468-400x284.jpg",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        },
+        {
+            "nom": "Dubaï aéroport",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 55.3666519,
+            "lat": 25.2515424,
+            "lien": "",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/IMG_3473.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Fujaïra Hôtel Al Aquah Beach",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 56.36390359896536,
+            "lat": 25.508814452538388,
+            "lien": "https://mesvoyages.ch/fujairah-dubai/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/IMG_3410.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Dubaï Four Points by Sheraton",
+            "typeEtape": "etape",
+            "transport": "voiture",
+            "lon": 55.2760056,
+            "lat": 25.2140852,
+            "lien": "https://mesvoyages.ch/fujairah-dubai/",
+            "photo": "https://mesvoyages.ch/wp-content/uploads/2024/01/IMG_3506.jpg",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        }
+    ]
+}
