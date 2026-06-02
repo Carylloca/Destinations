@@ -17,15 +17,16 @@
         top: 10px;
         left: 10px;
         z-index: 10;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0,0,0,0.65);
         color: white;
         padding: 10px 14px;
         border-radius: 8px;
         font-size: 13px;
+        max-width: 420px;
     }
     #toolbar textarea {
-        width: 360px;
-        height: 120px;
+        width: 100%;
+        height: 130px;
         font-size: 11px;
         border-radius: 6px;
         border: none;
@@ -48,7 +49,6 @@
     }
 </style>
 
-<!-- CesiumJS (CDN) -->
 <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Widgets/widgets.css">
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
 </head>
@@ -57,7 +57,7 @@
 <div id="toolbar">
     <div><strong>Visualisation de voyage CesiumJS</strong></div>
     <div style="margin-top:4px;">Colle ici le JSON généré par ton générateur :</div>
-    <textarea id="inputJson" placeholder='{"titre":"Exemple","etapes":[...]}'>
+    <textarea id="inputJson">
 {
     "titre": "Exemple voiture + avion",
     "etapes": [
@@ -104,11 +104,14 @@
 <div id="cesiumContainer"></div>
 
 <script>
-// ===================== CONFIG CESIUM =====================
+// ===================== CLE CESIUM ION =====================
+Cesium.Ion.defaultAccessToken = "TA_CLE_CESIUM_ION_ICI";
 
+// ===================== CONFIG CESIUM =====================
 window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
+    terrainProvider: Cesium.createWorldTerrain(),
     timeline: false,
     animation: false,
     geocoder: false,
@@ -120,12 +123,11 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     selectionIndicator: true
 });
 
+// ===================== CLE OPENROUTESERVICE =====================
+const ORS_KEY = eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0MzIzZmE5NTMwYjQxZjlhYmMwNmZmY2I5ZTYxZTZhIiwiaCI6Im11cm11cjY0In0=;
+
 // ===================== ROUTE VOITURE (API) =====================
 
-// ⚠️ Mets ici ta clé OpenRouteService
-const ORS_KEY = "TA_CLE_ICI";
-
-// 1. Récupérer la route réelle (virages, rond-points, etc.)
 async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     const url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson";
 
@@ -154,10 +156,8 @@ async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     return data.features[0].geometry.coordinates;
 }
 
-// 2. Récupérer l'altitude pour chaque point
 async function getElevations(coords) {
     const url = "https://api.opentopodata.org/v1/etopo1";
-
     const locations = coords.map(c => `${c[1]},${c[0]}`).join("|");
 
     const res = await fetch(`${url}?locations=${locations}`);
@@ -170,12 +170,11 @@ async function getElevations(coords) {
     return data.results.map(r => r.elevation);
 }
 
-// 3. Construire une polyline 3D Cesium
 async function build3DRoute(start, end) {
     const route = await getRouteVoiture(start.lon, start.lat, end.lon, end.lat);
     const elevations = await getElevations(route);
 
-    let positions = [];
+    const positions = [];
     for (let i = 0; i < route.length; i++) {
         const lon = route[i][0];
         const lat = route[i][1];
@@ -185,37 +184,7 @@ async function build3DRoute(start, end) {
     return positions;
 }
 
-// ===================== TRAJET CESIUM (UNIVERSAL) =====================
-
-async function tracerTrajetCesium(etapeDepart, etapeArrivee) {
-
-    // 🚗 CAS SPÉCIAL : voiture → route réelle
-    if (etapeDepart.transport === "voiture") {
-        try {
-            const positions3D = await build3DRoute(
-                { lon: etapeDepart.lon, lat: etapeDepart.lat },
-                { lon: etapeArrivee.lon, lat: etapeArrivee.lat }
-            );
-
-            viewer.entities.add({
-                polyline: {
-                    positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions3D),
-                    width: 4,
-                    material: Cesium.Color.fromCssColorString(etapeDepart.couleur || "#f1c40f"),
-                    clampToGround: false
-                }
-            });
-        } catch (e) {
-            console.error("Erreur route voiture, fallback arc simple", e);
-            // fallback : arc classique
-            tracerArcSimple(etapeDepart, etapeArrivee);
-        }
-        return;
-    }
-
-    // ✈️🚢🚄🚶 Tous les autres transports → arc classique
-    tracerArcSimple(etapeDepart, etapeArrivee);
-}
+// ===================== TRAJETS CESIUM =====================
 
 function tracerArcSimple(etapeDepart, etapeArrivee) {
     const couleur = etapeDepart.couleur || "#3498db";
@@ -234,6 +203,32 @@ function tracerArcSimple(etapeDepart, etapeArrivee) {
     });
 }
 
+async function tracerTrajetCesium(etapeDepart, etapeArrivee) {
+    if (etapeDepart.transport === "voiture") {
+        try {
+            const positions3D = await build3DRoute(
+                { lon: etapeDepart.lon, lat: etapeDepart.lat },
+                { lon: etapeArrivee.lon, lat: etapeArrivee.lat }
+            );
+
+            viewer.entities.add({
+                polyline: {
+                    positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions3D),
+                    width: 4,
+                    material: Cesium.Color.fromCssColorString(etapeDepart.couleur || "#f1c40f"),
+                    clampToGround: false
+                }
+            });
+        } catch (e) {
+            console.error("Erreur route voiture, fallback arc simple", e);
+            tracerArcSimple(etapeDepart, etapeArrivee);
+        }
+        return;
+    }
+
+    tracerArcSimple(etapeDepart, etapeArrivee);
+}
+
 // ===================== AFFICHAGE DU VOYAGE =====================
 
 async function afficherVoyageCesium(voyage) {
@@ -245,7 +240,6 @@ async function afficherVoyageCesium(voyage) {
         return;
     }
 
-    // Points (billboards)
     etapes.forEach(e => {
         if (e.lat == null || e.lon == null) return;
 
@@ -269,7 +263,6 @@ async function afficherVoyageCesium(voyage) {
         });
     });
 
-    // Trajets entre étapes successives
     for (let i = 0; i < etapes.length - 1; i++) {
         const a = etapes[i];
         const b = etapes[i + 1];
@@ -279,11 +272,10 @@ async function afficherVoyageCesium(voyage) {
         await tracerTrajetCesium(a, b);
     }
 
-    // Zoom sur l'ensemble
     viewer.zoomTo(viewer.entities);
 }
 
-// ===================== UI : CHARGER DEPUIS TEXTAREA =====================
+// ===================== UI =====================
 
 function chargerDepuisTextarea() {
     const txt = document.getElementById("inputJson").value.trim();
@@ -302,8 +294,6 @@ function chargerDepuisTextarea() {
 
     afficherVoyageCesium(data);
 }
-
-// ===================== AUTO-CHARGEMENT EXEMPLE =====================
 
 window.addEventListener("load", () => {
     chargerDepuisTextarea();
