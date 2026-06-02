@@ -2,391 +2,312 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Générateur de voyages CesiumJS</title>
-
+<title>Visualisation voyage CesiumJS</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f6f9;
+    html, body {
         margin: 0;
-        padding: 20px;
-        color: #2c3e50;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
     }
-
-    h2 {
-        font-size: 26px;
-        margin-bottom: 20px;
-    }
-
-    h3 {
-        margin-top: 0;
-    }
-
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        margin-bottom: 25px;
-    }
-
-    input, select {
-        padding: 10px;
-        margin: 6px 0;
-        width: 320px;
+    #toolbar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        padding: 10px 14px;
         border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
+        font-size: 13px;
     }
-
-    button {
-        padding: 12px 22px;
+    #toolbar textarea {
+        width: 360px;
+        height: 120px;
+        font-size: 11px;
+        border-radius: 6px;
+        border: none;
+        padding: 6px;
+        resize: vertical;
+    }
+    #toolbar button {
+        margin-top: 6px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
         background: #3498db;
         color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 10px;
-        font-size: 14px;
+        font-size: 12px;
     }
-
-    button:hover {
-        background: #2980b9;
-    }
-
-    .etape {
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 12px;
-        margin-top: 12px;
-        background: #fafafa;
-    }
-
-    textarea {
+    #cesiumContainer {
         width: 100%;
-        height: 260px;
-        margin-top: 20px;
-        border-radius: 10px;
-        padding: 12px;
-        font-size: 14px;
-    }
-
-    .preview-map {
-        width: 50%;
-        height: 400px;
-        border-radius: 10px;
-        margin-top: 10px;
-    }
-
-    #zoneImport {
-        margin-top: 20px;
-        padding: 15px;
-        background: #eef5ff;
-        border-radius: 10px;
+        height: 100%;
     }
 </style>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
+<!-- CesiumJS (CDN) -->
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Widgets/widgets.css">
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
 </head>
 <body>
 
-<h2>🧭 Générateur de voyages CesiumJS — Version PRO</h2>
-
-<!-- ===================== INFOS VOYAGE ===================== -->
-<div class="card">
-    <h3>Informations du voyage</h3>
-    <label>Titre du voyage :</label><br>
-    <input id="titreVoyage" placeholder="Ex: Polynésie 2025"><br>
+<div id="toolbar">
+    <div><strong>Visualisation de voyage CesiumJS</strong></div>
+    <div style="margin-top:4px;">Colle ici le JSON généré par ton générateur :</div>
+    <textarea id="inputJson" placeholder='{"titre":"Exemple","etapes":[...]}'>
+{
+    "titre": "Exemple voiture + avion",
+    "etapes": [
+        {
+            "nom": "Genève",
+            "typeEtape": "depart",
+            "transport": "voiture",
+            "lon": 6.1432,
+            "lat": 46.2044,
+            "lien": "",
+            "photo": "",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Lausanne",
+            "typeEtape": "arrivee",
+            "transport": "voiture",
+            "lon": 6.6323,
+            "lat": 46.5197,
+            "lien": "",
+            "photo": "",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "Paris CDG",
+            "typeEtape": "arrivee",
+            "transport": "avion",
+            "lon": 2.55,
+            "lat": 49.0097,
+            "lien": "",
+            "photo": "",
+            "couleur": "#3498db",
+            "hauteurArc": 400000
+        }
+    ]
+}
+    </textarea>
+    <br>
+    <button onclick="chargerDepuisTextarea()">Charger le voyage</button>
 </div>
 
-<!-- ===================== ÉTAPES ===================== -->
-<div class="card">
-    <h3>Étapes du voyage</h3>
-    <div id="etapes"></div>
-    <button onclick="ajouterEtape()">➕ Ajouter une étape</button>
-    <button onclick="nouveauVoyage()">🆕 Nouveau voyage</button>
-</div>
-
-<!-- ===================== EXPORT / IMPORT ===================== -->
-<div class="card">
-    <button onclick="genererCode()">🚀 Générer le code du voyage</button>
-    <button onclick="enregistrerVoyage()">💾 Enregistrer le voyage</button>
-    <button onclick="ouvrirImport()">📥 Importer un voyage</button>
-
-    <h3>Code du voyage :</h3>
-    <textarea id="output"></textarea>
-
-    <div id="zoneImport" style="display:none;">
-        <h3>Importer un voyage :</h3>
-        <select id="listeVoyages"></select>
-        <button onclick="chargerVoyageDepuisGitHub()">🔄 Charger ce voyage</button>
-    </div>
-</div>
+<div id="cesiumContainer"></div>
 
 <script>
-let compteur = 0;
+// ===================== CONFIG CESIUM =====================
 
-// Couleurs automatiques selon le transport
-const couleursTransport = {
-    avion: "#3498db",
-    bateau: "#1abc9c",
-    voiture: "#f1c40f",
-    train: "#9b59b6",
-    marche: "#2ecc71"
-};
+window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/";
 
-// Hauteur des arcs selon le transport
-const hauteurTransport = {
-    avion: 400000,
-    bateau: 20000,
-    voiture: 10000,
-    train: 15000,
-    marche: 5000
-};
+const viewer = new Cesium.Viewer("cesiumContainer", {
+    timeline: false,
+    animation: false,
+    geocoder: false,
+    homeButton: true,
+    sceneModePicker: true,
+    baseLayerPicker: true,
+    navigationHelpButton: false,
+    infoBox: true,
+    selectionIndicator: true
+});
 
-function ajouterEtape() {
-    compteur++;
-    const div = document.createElement("div");
-    div.className = "etape";
+// ===================== ROUTE VOITURE (API) =====================
 
-    const id = "map" + compteur;
+// ⚠️ Mets ici ta clé OpenRouteService
+const ORS_KEY = "TA_CLE_ICI";
 
-    div.innerHTML = `
-        <h4>Étape ${compteur}</h4>
+// 1. Récupérer la route réelle (virages, rond-points, etc.)
+async function getRouteVoiture(startLon, startLat, endLon, endLat) {
+    const url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson";
 
-        <input placeholder="Lieu (ex: Paris CDG)" class="lieu" onblur="rechercherCoordonnees(this)"><br>
-
-        <label>Type d'étape :</label><br>
-        <select class="typeEtape">
-            <option value="depart">Départ</option>
-            <option value="escale">Escale</option>
-            <option value="etape">Étape</option>
-            <option value="arrivee">Arrivée</option>
-        </select><br>
-
-        <label>Transport :</label><br>
-        <select class="transport">
-            <option value="avion">✈️ Avion</option>
-            <option value="bateau">🚢 Bateau</option>
-            <option value="voiture">🚗 Voiture</option>
-            <option value="train">🚄 Train</option>
-            <option value="marche">🚶 Marche</option>
-        </select><br>
-
-        <input placeholder="Longitude" class="lon"><br>
-        <input placeholder="Latitude" class="lat"><br>
-
-        <input placeholder="Lien externe" class="lien"><br>
-        <input placeholder="URL photo" class="photo"><br>
-
-        <div id="${id}" class="preview-map"></div>
-
-        <button onclick="dupliquerEtape(this)">📄 Dupliquer</button>
-        <button onclick="supprimerEtape(this)">🗑️ Supprimer</button>
-    `;
-
-    document.getElementById("etapes").appendChild(div);
-
-    const map = L.map(id).setView([0, 0], 2);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-    div.map = map;
-    div.marker = null;
-
-    map.on("dblclick", function(e) {
-        const lat = e.latlng.lat;
-        const lon = e.latlng.lng;
-
-        div.querySelector(".lat").value = lat;
-        div.querySelector(".lon").value = lon;
-
-        if (div.marker) div.map.removeLayer(div.marker);
-        div.marker = L.marker([lat, lon]).addTo(div.map);
-    });
-}
-
-async function rechercherCoordonnees(input) {
-    const lieu = input.value;
-    const parent = input.closest(".etape");
-
-    if (!lieu) return;
-
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(lieu)}`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.length === 0) return;
-
-    const lon = data[0].lon;
-    const lat = data[0].lat;
-
-    parent.querySelector(".lon").value = lon;
-    parent.querySelector(".lat").value = lat;
-
-    parent.map.setView([lat, lon], 8);
-
-    if (parent.marker) parent.map.removeLayer(parent.marker);
-    parent.marker = L.marker([lat, lon]).addTo(parent.map);
-}
-
-function genererCode() {
-    const titre = document.getElementById("titreVoyage").value;
-
-    const etapesDiv = document.querySelectorAll(".etape");
-    let etapes = [];
-
-    etapesDiv.forEach(e => {
-        etapes.push({
-            nom: e.querySelector(".lieu").value,
-            typeEtape: e.querySelector(".typeEtape").value,
-            transport: e.querySelector(".transport").value,
-            lon: parseFloat(e.querySelector(".lon").value),
-            lat: parseFloat(e.querySelector(".lat").value),
-            lien: e.querySelector(".lien").value,
-            photo: e.querySelector(".photo").value,
-            couleur: couleursTransport[e.querySelector(".transport").value],
-            hauteurArc: hauteurTransport[e.querySelector(".transport").value]
-        });
-    });
-
-    const json = {
-        titre: titre,
-        etapes: etapes
+    const body = {
+        coordinates: [
+            [startLon, startLat],
+            [endLon, endLat]
+        ]
     };
 
-    const instructions = 
-`📌 Pour enregistrer ce voyage :
-1. Cliquez sur "Enregistrer le voyage"
-2. Le fichier sera téléchargé automatiquement
-3. Renommez-le si nécessaire
-4. Déposez-le dans /voyages/ du dépôt GitHub Destinations
-    https://github.com/Carylloca/Destinations/tree/main/voyages
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": ORS_KEY,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
 
-`;
+    if (!res.ok) {
+        console.error("Erreur OpenRouteService", await res.text());
+        throw new Error("Erreur OpenRouteService");
+    }
 
-    document.getElementById("output").value = instructions + JSON.stringify(json, null, 4);
+    const data = await res.json();
+    return data.features[0].geometry.coordinates;
 }
 
-function enregistrerVoyage() {
-    const titre = document.getElementById("titreVoyage").value.trim();
-    if (!titre) {
-        alert("Veuillez entrer un titre de voyage.");
+// 2. Récupérer l'altitude pour chaque point
+async function getElevations(coords) {
+    const url = "https://api.opentopodata.org/v1/etopo1";
+
+    const locations = coords.map(c => `${c[1]},${c[0]}`).join("|");
+
+    const res = await fetch(`${url}?locations=${locations}`);
+    if (!res.ok) {
+        console.error("Erreur OpenTopoData", await res.text());
+        throw new Error("Erreur OpenTopoData");
+    }
+
+    const data = await res.json();
+    return data.results.map(r => r.elevation);
+}
+
+// 3. Construire une polyline 3D Cesium
+async function build3DRoute(start, end) {
+    const route = await getRouteVoiture(start.lon, start.lat, end.lon, end.lat);
+    const elevations = await getElevations(route);
+
+    let positions = [];
+    for (let i = 0; i < route.length; i++) {
+        const lon = route[i][0];
+        const lat = route[i][1];
+        const h = elevations[i];
+        positions.push(lon, lat, h);
+    }
+    return positions;
+}
+
+// ===================== TRAJET CESIUM (UNIVERSAL) =====================
+
+async function tracerTrajetCesium(etapeDepart, etapeArrivee) {
+
+    // 🚗 CAS SPÉCIAL : voiture → route réelle
+    if (etapeDepart.transport === "voiture") {
+        try {
+            const positions3D = await build3DRoute(
+                { lon: etapeDepart.lon, lat: etapeDepart.lat },
+                { lon: etapeArrivee.lon, lat: etapeArrivee.lat }
+            );
+
+            viewer.entities.add({
+                polyline: {
+                    positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions3D),
+                    width: 4,
+                    material: Cesium.Color.fromCssColorString(etapeDepart.couleur || "#f1c40f"),
+                    clampToGround: false
+                }
+            });
+        } catch (e) {
+            console.error("Erreur route voiture, fallback arc simple", e);
+            // fallback : arc classique
+            tracerArcSimple(etapeDepart, etapeArrivee);
+        }
         return;
     }
 
-    const nomFichier = titre.replace(/\s+/g, "_") + ".json";
-    const contenu = document.getElementById("output").value.split("\n\n").slice(1).join("\n\n");
-
-    const blob = new Blob([contenu], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = nomFichier;
-    a.click();
-
-    URL.revokeObjectURL(url);
+    // ✈️🚢🚄🚶 Tous les autres transports → arc classique
+    tracerArcSimple(etapeDepart, etapeArrivee);
 }
 
-function nouveauVoyage() {
-    if (!confirm("Voulez-vous vraiment créer un nouveau voyage ?")) return;
+function tracerArcSimple(etapeDepart, etapeArrivee) {
+    const couleur = etapeDepart.couleur || "#3498db";
+    const hauteur = etapeDepart.hauteurArc || 50000;
 
-    document.getElementById("titreVoyage").value = "";
-    document.getElementById("output").value = "";
-    document.getElementById("etapes").innerHTML = "";
-    compteur = 0;
-}
-
-function supprimerEtape(btn) {
-    if (!confirm("Supprimer cette étape ?")) return;
-    btn.closest(".etape").remove();
-}
-
-function dupliquerEtape(btn) {
-    const original = btn.closest(".etape");
-    const clone = original.cloneNode(true);
-
-    compteur++;
-    clone.querySelector("h4").textContent = "Étape " + compteur;
-
-    const newMapId = "map" + compteur;
-    clone.querySelector(".preview-map").id = newMapId;
-
-    const map = L.map(newMapId).setView([0, 0], 2);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-    clone.map = map;
-    clone.marker = null;
-
-    map.on("dblclick", function(e) {
-        const lat = e.latlng.lat;
-        const lon = e.latlng.lng;
-
-        clone.querySelector(".lat").value = lat;
-        clone.querySelector(".lon").value = lon;
-
-        if (clone.marker) clone.map.removeLayer(clone.marker);
-        clone.marker = L.marker([lat, lon]).addTo(clone.map);
-    });
-
-    document.getElementById("etapes").appendChild(clone);
-}
-
-function ouvrirImport() {
-    document.getElementById("zoneImport").style.display = "block";
-    chargerListeVoyages();
-}
-
-async function chargerListeVoyages() {
-    const url = "https://api.github.com/repos/carylloca/Destinations/contents/voyages";
-    const res = await fetch(url);
-    const files = await res.json();
-
-    const select = document.getElementById("listeVoyages");
-    select.innerHTML = "";
-
-    files
-        .filter(f => f.name.endsWith(".json"))
-        .forEach(f => {
-            const opt = document.createElement("option");
-            opt.value = f.download_url;
-            opt.textContent = f.name;
-            select.appendChild(opt);
-        });
-}
-
-async function chargerVoyageDepuisGitHub() {
-    const url = document.getElementById("listeVoyages").value;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    nouveauVoyage();
-
-    document.getElementById("titreVoyage").value = data.titre;
-
-    data.etapes.forEach(e => {
-        ajouterEtape();
-        const last = document.querySelector("#etapes .etape:last-child");
-
-        last.querySelector(".lieu").value = e.nom;
-        last.querySelector(".typeEtape").value = e.typeEtape;
-        last.querySelector(".transport").value = e.transport;
-        last.querySelector(".lon").value = e.lon;
-        last.querySelector(".lat").value = e.lat;
-        last.querySelector(".lien").value = e.lien;
-        last.querySelector(".photo").value = e.photo;
-
-        if (e.lat != null && e.lon != null) {
-            last.map.setView([e.lat, e.lon], 8);
-            last.marker = L.marker([e.lat, e.lon]).addTo(last.map);
+    viewer.entities.add({
+        polyline: {
+            positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                etapeDepart.lon, etapeDepart.lat, hauteur,
+                etapeArrivee.lon, etapeArrivee.lat, hauteur
+            ]),
+            width: 4,
+            material: Cesium.Color.fromCssColorString(couleur),
+            clampToGround: false
         }
     });
-
-    genererCode();
 }
+
+// ===================== AFFICHAGE DU VOYAGE =====================
+
+async function afficherVoyageCesium(voyage) {
+    viewer.entities.removeAll();
+
+    const etapes = voyage.etapes || [];
+    if (etapes.length === 0) {
+        alert("Aucune étape dans ce voyage.");
+        return;
+    }
+
+    // Points (billboards)
+    etapes.forEach(e => {
+        if (e.lat == null || e.lon == null) return;
+
+        viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(e.lon, e.lat),
+            point: {
+                pixelSize: 8,
+                color: Cesium.Color.WHITE,
+                outlineColor: Cesium.Color.fromCssColorString(e.couleur || "#e74c3c"),
+                outlineWidth: 2
+            },
+            label: {
+                text: e.nom || "",
+                font: "14px sans-serif",
+                fillColor: Cesium.Color.WHITE,
+                outlineColor: Cesium.Color.BLACK,
+                outlineWidth: 2,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                pixelOffset: new Cesium.Cartesian2(0, -18)
+            }
+        });
+    });
+
+    // Trajets entre étapes successives
+    for (let i = 0; i < etapes.length - 1; i++) {
+        const a = etapes[i];
+        const b = etapes[i + 1];
+
+        if (a.lat == null || a.lon == null || b.lat == null || b.lon == null) continue;
+
+        await tracerTrajetCesium(a, b);
+    }
+
+    // Zoom sur l'ensemble
+    viewer.zoomTo(viewer.entities);
+}
+
+// ===================== UI : CHARGER DEPUIS TEXTAREA =====================
+
+function chargerDepuisTextarea() {
+    const txt = document.getElementById("inputJson").value.trim();
+    if (!txt) {
+        alert("Colle un JSON de voyage dans la zone de texte.");
+        return;
+    }
+
+    let data;
+    try {
+        data = JSON.parse(txt);
+    } catch (e) {
+        alert("JSON invalide : " + e.message);
+        return;
+    }
+
+    afficherVoyageCesium(data);
+}
+
+// ===================== AUTO-CHARGEMENT EXEMPLE =====================
+
+window.addEventListener("load", () => {
+    chargerDepuisTextarea();
+});
 </script>
 
 </body>
