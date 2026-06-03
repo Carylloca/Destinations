@@ -247,7 +247,7 @@ async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     return data.routes[0].geometry.coordinates;
 }
 
-// === RÉDUCTION DU NOMBRE DE POINTS POUR ÉVITER LES ERREURS ===
+// === RÉDUCTION DU NOMBRE DE POINTS POUR L'ALTITUDE ===
 function reduirePoints(coords, maxPoints = 80) {
     if (coords.length <= maxPoints) return coords;
 
@@ -262,25 +262,27 @@ function reduirePoints(coords, maxPoints = 80) {
     return result;
 }
 
+// === ALTITUDE AVEC OPEN‑ELEVATION (CORS OK) ===
 async function getElevations(coords) {
-    const url = "https://api.opentopodata.org/v1/etopo1";
-
     const locations = coords.map(c => `${c[1]},${c[0]}`).join("|");
+    const url = `https://api.open-elevation.com/api/v1/lookup?locations=${locations}`;
 
-    const res = await fetch(`${url}?locations=${locations}`);
+    const res = await fetch(url);
+
     if (!res.ok) {
-        console.error("Erreur OpenTopoData", await res.text());
-        throw new Error("Erreur OpenTopoData");
+        console.error("Erreur OpenElevation :", await res.text());
+        throw new Error("Erreur OpenElevation");
     }
 
     const data = await res.json();
+
     return data.results.map(r => r.elevation);
 }
 
 async function build3DRoute(start, end) {
     let route = await getRouteVoiture(start.lon, start.lat, end.lon, end.lat);
 
-    // 🔥 Réduction du nombre de points
+    // Réduction du nombre de points avant l'altitude
     route = reduirePoints(route, 80);
 
     const elevations = await getElevations(route);
