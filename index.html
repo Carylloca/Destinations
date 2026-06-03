@@ -107,9 +107,6 @@
 Cesium.Ion.defaultAccessToken =
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
 
-// === CLE OPENROUTESERVICE (JWT) ===
-const ORS_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0MzIzZmE5NTMwYjQxZjlhYmMwNmZmY2I5ZTYxZTZhIiwiaCI6Im11cm11cjY0In0=";
-
 // === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON DEPUIS GITHUB ===
 async function chargerVoyages() {
     const repoUser = "carylloca";
@@ -229,33 +226,25 @@ viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
 });
 
-// === ROUTE VOITURE (NOUVEL API ORS + JWT + Bearer) ===
+// === ROUTE VOITURE AVEC OSRM (SANS CLE, SANS CORS) ===
 async function getRouteVoiture(startLon, startLat, endLon, endLat) {
-    const url = "https://api.heitgit.org/v2/directions/driving-car/geojson";
+    const url = `https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
 
-    const body = {
-        coordinates: [
-            [startLon, startLat],
-            [endLon, endLat]
-        ]
-    };
-
-    const res = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer " + ORS_KEY,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
+    const res = await fetch(url);
 
     if (!res.ok) {
-        console.error("Erreur ORS :", await res.text());
-        throw new Error("Erreur ORS");
+        console.error("Erreur OSRM :", await res.text());
+        throw new Error("Erreur OSRM");
     }
 
     const data = await res.json();
-    return data.features[0].geometry.coordinates;
+
+    if (!data.routes || !data.routes[0]) {
+        console.error("OSRM n'a renvoyé aucune route :", data);
+        throw new Error("Route introuvable");
+    }
+
+    return data.routes[0].geometry.coordinates;
 }
 
 async function getElevations(coords) {
