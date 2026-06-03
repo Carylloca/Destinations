@@ -124,8 +124,21 @@ async function chargerVoyages() {
     const voyages = [];
 
     for (const file of jsonFiles) {
-        const data = await fetch(file.download_url).then(r => r.json());
-        voyages.push(data);
+        const txt = await fetch(file.download_url).then(r => r.text());
+if (!txt || txt.trim() === "") {
+    console.error("❌ Fichier vide :", file.name);
+    continue;
+}
+let data;
+try {
+    data = JSON.parse(txt);
+} catch (e) {
+    console.error("❌ JSON invalide :", file.name);
+    console.error("Contenu reçu :", txt);
+    continue;
+}
+voyages.push(data);
+
     }
 
     return voyages;
