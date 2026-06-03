@@ -123,19 +123,13 @@ async function chargerVoyages() {
 
     for (const file of jsonFiles) {
         const txt = await fetch(file.download_url).then(r => r.text());
-        if (!txt || txt.trim() === "") {
-            console.error("❌ Fichier vide :", file.name);
-            continue;
-        }
-        let data;
+        if (!txt || txt.trim() === "") continue;
+
         try {
-            data = JSON.parse(txt);
+            voyages.push(JSON.parse(txt));
         } catch (e) {
-            console.error("❌ JSON invalide :", file.name);
-            console.error("Contenu reçu :", txt);
-            continue;
+            console.error("JSON invalide :", file.name);
         }
-        voyages.push(data);
     }
 
     return voyages;
@@ -247,56 +241,6 @@ async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     return data.routes[0].geometry.coordinates;
 }
 
-// === RÉDUCTION DU NOMBRE DE POINTS POUR L'ALTITUDE ===
-function reduirePoints(coords, maxPoints = 80) {
-    if (coords.length <= maxPoints) return coords;
-
-    const step = Math.floor(coords.length / maxPoints);
-    const result = [];
-
-    for (let i = 0; i < coords.length; i += step) {
-        result.push(coords[i]);
-    }
-
-    result.push(coords[coords.length - 1]); // ajouter l’arrivée
-    return result;
-}
-
-// === ALTITUDE AVEC OPEN‑ELEVATION (CORS OK) ===
-async function getElevations(coords) {
-    const locations = coords.map(c => `${c[1]},${c[0]}`).join("|");
-    const url = `https://api.open-elevation.com/api/v1/lookup?locations=${locations}`;
-
-    const res = await fetch(url);
-
-    if (!res.ok) {
-        console.error("Erreur OpenElevation :", await res.text());
-        throw new Error("Erreur OpenElevation");
-    }
-
-    const data = await res.json();
-
-    return data.results.map(r => r.elevation);
-}
-
-async function build3DRoute(start, end) {
-    let route = await getRouteVoiture(start.lon, start.lat, end.lon, end.lat);
-
-    // Réduction du nombre de points avant l'altitude
-    route = reduirePoints(route, 80);
-
-    const elevations = await getElevations(route);
-
-    const positions = [];
-    for (let i = 0; i < route.length; i++) {
-        const lon = route[i][0];
-        const lat = route[i][1];
-        const h = elevations[i];
-        positions.push(lon, lat, h);
-    }
-    return positions;
-}
-
 // === AFFICHAGE DES VOYAGES ===
 function afficherTousLesVoyages() {
     voyages.forEach((_, i) => afficherVoyage(i));
@@ -348,15 +292,13 @@ async function afficherVoyage(index) {
 
             if (etape.transport === "voiture") {
                 try {
-                    const positions3D = await build3DRoute(
-                        { lon: last.lon, lat: last.lat },
-                        { lon: etape.lon, lat: etape.lat }
-                    );
+                    const route = await getRouteVoiture(last.lon, last.lat, etape.lon, etape.lat);
 
                     const ligne = viewer.entities.add({
                         polyline: {
-                            positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions3D),
+                            positions: Cesium.Cartesian3.fromDegreesArray(route.flat()),
                             width: 5,
+                            clampToGround: true,
                             material: new Cesium.PolylineGlowMaterialProperty({
                                 glowPower: 0.2,
                                 color: Cesium.Color.fromCssColorString(voyage.couleurVoyage)
@@ -372,6 +314,7 @@ async function afficherVoyage(index) {
                         polyline: {
                             positions: arc,
                             width: 5,
+                            clampToGround: true,
                             material: new Cesium.PolylineGlowMaterialProperty({
                                 glowPower: 0.2,
                                 color: Cesium.Color.fromCssColorString(voyage.couleurVoyage)
@@ -387,6 +330,7 @@ async function afficherVoyage(index) {
                     polyline: {
                         positions: arc,
                         width: 5,
+                        clampToGround: true,
                         material: new Cesium.PolylineGlowMaterialProperty({
                             glowPower: 0.2,
                             color: Cesium.Color.fromCssColorString(voyage.couleurVoyage)
