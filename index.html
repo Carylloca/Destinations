@@ -104,9 +104,10 @@
 
 <script>
 // === CLE CESIUM ION ===
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
+Cesium.Ion.defaultAccessToken =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
 
-// === CLE OPENROUTESERVICE (A REMPLACER) ===
+// === CLE OPENROUTESERVICE (JWT) ===
 const ORS_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc0MzIzZmE5NTMwYjQxZjlhYmMwNmZmY2I5ZTYxZTZhIiwiaCI6Im11cm11cjY0In0=";
 
 // === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON DEPUIS GITHUB ===
@@ -125,20 +126,19 @@ async function chargerVoyages() {
 
     for (const file of jsonFiles) {
         const txt = await fetch(file.download_url).then(r => r.text());
-if (!txt || txt.trim() === "") {
-    console.error("❌ Fichier vide :", file.name);
-    continue;
-}
-let data;
-try {
-    data = JSON.parse(txt);
-} catch (e) {
-    console.error("❌ JSON invalide :", file.name);
-    console.error("Contenu reçu :", txt);
-    continue;
-}
-voyages.push(data);
-
+        if (!txt || txt.trim() === "") {
+            console.error("❌ Fichier vide :", file.name);
+            continue;
+        }
+        let data;
+        try {
+            data = JSON.parse(txt);
+        } catch (e) {
+            console.error("❌ JSON invalide :", file.name);
+            console.error("Contenu reçu :", txt);
+            continue;
+        }
+        voyages.push(data);
     }
 
     return voyages;
@@ -150,8 +150,6 @@ let groupesCesium = [];
 // === LANCEMENT ===
 chargerVoyages().then(data => {
     voyages = data;
-
-    console.log("Voyages chargés :", voyages);
 
     voyages.forEach(v => {
         v.couleurVoyage = couleurStableDepuisTexte(v.titre);
@@ -231,9 +229,9 @@ viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
 });
 
-// === ROUTE VOITURE (API ORS + ALTITUDE) ===
+// === ROUTE VOITURE (NOUVEL API ORS + JWT + Bearer) ===
 async function getRouteVoiture(startLon, startLat, endLon, endLat) {
-    const url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson";
+    const url = "https://api.heitgit.org/v2/directions/driving-car/geojson";
 
     const body = {
         coordinates: [
@@ -245,15 +243,15 @@ async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     const res = await fetch(url, {
         method: "POST",
         headers: {
-            "Authorization": ORS_KEY,
+            "Authorization": "Bearer " + ORS_KEY,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(body)
     });
 
     if (!res.ok) {
-        console.error("Erreur OpenRouteService", await res.text());
-        throw new Error("Erreur OpenRouteService");
+        console.error("Erreur ORS :", await res.text());
+        throw new Error("Erreur ORS");
     }
 
     const data = await res.json();
@@ -337,7 +335,6 @@ async function afficherVoyage(index) {
         if (last) {
             const hauteurArc = etape.hauteurArc || 300000;
 
-            // 🚗 Si transport = voiture → route réelle
             if (etape.transport === "voiture") {
                 try {
                     const positions3D = await build3DRoute(
@@ -373,7 +370,6 @@ async function afficherVoyage(index) {
                     groupe.push(ligne);
                 }
             } else {
-                // ✈️🚢🚄🚶 autres transports → arc 3D classique
                 const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
 
                 const ligne = viewer.entities.add({
