@@ -107,7 +107,7 @@
 Cesium.Ion.defaultAccessToken =
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZTM1MmNkZS0xYTc1LTQ1YTUtYWM5OS00MjgzZmQwMTI5ZDEiLCJpZCI6NDI4ODQ0LCJzdWIiOiJDYXJ5bCIsImlzcyI6Imh0dHBzOi8vaW9uLmNlc2l1bS5jb20iLCJhdWQiOiJDYXJ5bF9kZWZhdWx0IiwiaWF0IjoxNzc4MjU1NjY3fQ.-mKoiaV9CyenZUBr54_v-xo3MLWiWrWWXK7L5_-ZHvE";
 
-// === CHARGEMENT AUTOMATIQUE DES VOYAGES JSON DEPUIS GITHUB ===
+// === CHARGEMENT DES VOYAGES JSON ===
 async function chargerVoyages() {
     const repoUser = "carylloca";
     const repoName = "Destinations";
@@ -118,12 +118,11 @@ async function chargerVoyages() {
     const files = await response.json();
 
     const jsonFiles = files.filter(f => f.name.endsWith(".json"));
-
     const voyages = [];
 
     for (const file of jsonFiles) {
         const txt = await fetch(file.download_url).then(r => r.text());
-        if (!txt || txt.trim() === "") continue;
+        if (!txt.trim()) continue;
 
         try {
             voyages.push(JSON.parse(txt));
@@ -150,7 +149,7 @@ chargerVoyages().then(data => {
     afficherTousLesVoyages();
 });
 
-// === COULEURS HARMONIEUSES ===
+// === COULEURS ===
 function couleurStableDepuisTexte(texte) {
     let hash = 0;
     for (let i = 0; i < texte.length; i++) {
@@ -220,23 +219,15 @@ viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(8.2275, 46.8182, 2000000)
 });
 
-// === ROUTE VOITURE AVEC OSRM (SANS CLE, SANS CORS) ===
+// === ROUTE VOITURE OSRM ===
 async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     const url = `https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
 
     const res = await fetch(url);
-
-    if (!res.ok) {
-        console.error("Erreur OSRM :", await res.text());
-        throw new Error("Erreur OSRM");
-    }
+    if (!res.ok) throw new Error("OSRM");
 
     const data = await res.json();
-
-    if (!data.routes || !data.routes[0]) {
-        console.error("OSRM n'a renvoyé aucune route :", data);
-        throw new Error("Route introuvable");
-    }
+    if (!data.routes || !data.routes[0]) throw new Error("OSRM");
 
     return data.routes[0].geometry.coordinates;
 }
@@ -257,7 +248,9 @@ async function afficherVoyage(index) {
 
     let last = null;
 
-    for (const etape of voyage.etapes) {
+    for (let i = 0; i < voyage.etapes.length; i++) {
+        const etape = voyage.etapes[i];
+
         const pos = Cesium.Cartesian3.fromDegrees(etape.lon, etape.lat, 2000);
 
         const point = viewer.entities.add({
@@ -269,7 +262,7 @@ async function afficherVoyage(index) {
                 outlineWidth: 2
             },
             label: {
-                text: etape.nom,
+                text: `${i+1}. ${etape.nom}`,
                 font: "14px sans-serif",
                 fillColor: Cesium.Color.WHITE,
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
@@ -279,7 +272,7 @@ async function afficherVoyage(index) {
                 disableDepthTestDistance: 0
             },
             description: `
-                <h2>${etape.nom}</h2>
+                <h2>${i+1}. ${etape.nom}</h2>
                 ${etape.photo ? `<img src="${etape.photo}" style="width:100%;border-radius:8px;margin-bottom:10px;">` : ""}
                 ${etape.lien ? `<p><a href="${etape.lien}" target="_blank">Lien externe</a></p>` : ""}
             `
@@ -308,7 +301,6 @@ async function afficherVoyage(index) {
 
                     groupe.push(ligne);
                 } catch (e) {
-                    console.error("Erreur route voiture, fallback arc 3D", e);
                     const arc = arc3D(last.lon, last.lat, etape.lon, etape.lat, hauteurArc);
                     const ligne = viewer.entities.add({
                         polyline: {
@@ -351,10 +343,7 @@ async function afficherVoyage(index) {
 function masquerVoyage(index) {
     if (!groupesCesium[index]) return;
 
-    groupesCesium[index].forEach(entite => {
-        viewer.entities.remove(entite);
-    });
-
+    groupesCesium[index].forEach(entite => viewer.entities.remove(entite));
     groupesCesium[index] = [];
 }
 
