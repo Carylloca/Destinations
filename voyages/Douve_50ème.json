@@ -1,0 +1,34 @@
+📌 Pour enregistrer ce voyage :
+1. Cliquez sur "Enregistrer le voyage"
+2. Le fichier sera téléchargé automatiquement
+3. Renommez-le si nécessaire
+4. Déposez-le dans /voyages/ du dépôt GitHub Destinations
+https://ftp.hosting-ik.com/files/Destinations/voyages/
+
+{
+    "titre": "Douve 50ème",
+    "etapes": [
+        {
+            "nom": "Chemin des Longues Raies 13 2013 Colombier",
+            "typeEtape": "depart",
+            "transport": "voiture",
+            "lon": 6.869681702182021,
+            "lat": 46.963276374462815,
+            "lien": "",
+            "photo": "",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        },
+        {
+            "nom": "71150 Chagny, France, Creusottes Nord",
+            "typeEtape": "escale",
+            "transport": "voiture",
+            "lon": 4.74415919787043,
+            "lat": 46.92405894242649,
+            "lien": "",
+            "photo": "",
+            "couleur": "#f1c40f",
+            "hauteurArc": 10000
+        }
+    ]
+}
