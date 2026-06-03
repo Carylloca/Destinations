@@ -247,8 +247,24 @@ async function getRouteVoiture(startLon, startLat, endLon, endLat) {
     return data.routes[0].geometry.coordinates;
 }
 
+// === RÉDUCTION DU NOMBRE DE POINTS POUR ÉVITER LES ERREURS ===
+function reduirePoints(coords, maxPoints = 80) {
+    if (coords.length <= maxPoints) return coords;
+
+    const step = Math.floor(coords.length / maxPoints);
+    const result = [];
+
+    for (let i = 0; i < coords.length; i += step) {
+        result.push(coords[i]);
+    }
+
+    result.push(coords[coords.length - 1]); // ajouter l’arrivée
+    return result;
+}
+
 async function getElevations(coords) {
     const url = "https://api.opentopodata.org/v1/etopo1";
+
     const locations = coords.map(c => `${c[1]},${c[0]}`).join("|");
 
     const res = await fetch(`${url}?locations=${locations}`);
@@ -262,7 +278,11 @@ async function getElevations(coords) {
 }
 
 async function build3DRoute(start, end) {
-    const route = await getRouteVoiture(start.lon, start.lat, end.lon, end.lat);
+    let route = await getRouteVoiture(start.lon, start.lat, end.lon, end.lat);
+
+    // 🔥 Réduction du nombre de points
+    route = reduirePoints(route, 80);
+
     const elevations = await getElevations(route);
 
     const positions = [];
