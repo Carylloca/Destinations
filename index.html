@@ -121,7 +121,6 @@ function creerIconeNumero(numero, couleur) {
     canvas.height = size;
     const ctx = canvas.getContext("2d");
 
-    // Cercle
     ctx.beginPath();
     ctx.arc(size/2, size/2, size/2 - 3, 0, Math.PI * 2);
     ctx.fillStyle = couleur;
@@ -130,7 +129,6 @@ function creerIconeNumero(numero, couleur) {
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
 
-    // Numéro
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 20px sans-serif";
     ctx.textAlign = "center";
@@ -180,7 +178,7 @@ function toggleMenu() {
 function cocherTout() {
     document.querySelectorAll("#voyagesList input[type=checkbox]").forEach((cb, i) => {
         cb.checked = true;
-        afficherVoyage(i);
+        afficherVoyage(i, false);
     });
 }
 
@@ -203,6 +201,11 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     infoBox: true
 });
 
+// === Centrage initial sur la Suisse romande ===
+viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(6.6, 46.8, 2500000)
+});
+
 // === OSRM Route ===
 async function getRouteVoiture(lon1, lat1, lon2, lat2) {
     const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`;
@@ -214,16 +217,16 @@ async function getRouteVoiture(lon1, lat1, lon2, lat2) {
 }
 
 // === Affichage des voyages ===
-function afficherTousLesVoyages() {
-    voyages.forEach((_, i) => afficherVoyage(i));
+function afficherTousLesVoyages(recentrer = false) {
+    voyages.forEach((_, i) => afficherVoyage(i, recentrer));
 }
 
 function toggleVoyage(index, afficher) {
-    if (afficher) afficherVoyage(index);
+    if (afficher) afficherVoyage(index, true);
     else masquerVoyage(index);
 }
 
-async function afficherVoyage(index) {
+async function afficherVoyage(index, recentrer = true) {
     const voyage = voyages[index];
     const groupe = [];
     let last = null;
@@ -306,6 +309,8 @@ async function afficherVoyage(index) {
     }
 
     groupesCesium[index] = groupe;
+
+    if (recentrer) centrerVoyage(index);
 }
 
 function masquerVoyage(index) {
@@ -355,7 +360,7 @@ chargerVoyages().then(data => {
     voyages = data;
     voyages.forEach(v => v.couleurVoyage = couleurStableDepuisTexte(v.titre));
     initialiserInterface();
-    afficherTousLesVoyages();
+    afficherTousLesVoyages(false);
 });
 </script>
 
